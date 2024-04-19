@@ -58,6 +58,6 @@ export function buildLimitedKanjiSet(kanjiList: KanjiList, levelLimit = 80): Kan
 
 //Get random kanji set and remove it from the original array
 export function getRandomKanjiSet(kanjiArray: Kanji[]) {
-	return kanjiArray.splice(Math.floor(Math.random() * kanjiArray.length), 1)
+	return kanjiArray.splice(Math.floor(Math.random() * kanjiArray.length), 1)[0]
 }
 
