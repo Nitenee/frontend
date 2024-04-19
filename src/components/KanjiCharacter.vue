@@ -29,6 +29,8 @@
 		font-size: 70px;
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
+		box-shadow: 2px 2px 2px #0004;
+		user-select: none;
 	}
 	span {
 		position: absolute;
@@ -45,6 +47,8 @@
 		background-color: #a6d189;
 		border-bottom-left-radius: 10px;
 		border-bottom-right-radius: 10px;
+		box-shadow: 2px 2px 2px #0004;
+		z-index: 1;
 	}
 	.left-corner {
 		border-bottom-left-radius: 0px;
@@ -56,15 +60,15 @@
 		position: relative;
 		height: 30px;
 		width: 40px;
-		background-color: #a6d189;
 	}
 	.puzzle-hole::after {
 		position: absolute;
 		content: "";
 		height: 100%;
 		width: 100%;
-		background-color: #303446;
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
+		z-index: 2;
+		box-shadow: 0px -10px 0px #a6d189;
 	}
 </style>

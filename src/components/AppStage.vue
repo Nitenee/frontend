@@ -4,7 +4,7 @@
 			<KanjiMeaning v-for="kanji in shuffledKanjiList" :key="kanji.meaning" :meaning="kanji.meaning" />
 		</section>
 		<section class="kanji-characters">
-			<KanjiCharacter v-for="kanji in shuffledKanjiList" :key="kanji.character" :character="kanji.character" />
+			<KanjiContainer v-for="kanji in shuffledKanjiList" :key="kanji.character" :kanji="kanji" />
 		</section>
 	</div>
 </template>
@@ -13,7 +13,7 @@
 	import { ref, reactive, inject, computed } from 'vue'
 	import { buildLimitedKanjiSet, getRandomKanjiSet } from '@/utils/utils'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
-	import KanjiCharacter from '@/components/KanjiCharacter.vue'
+	import KanjiContainer from '@/components/KanjiContainer.vue'
 
 	const allKanji = inject('kanji')
 	let levelLimit = 14
@@ -53,19 +53,17 @@
 <style scoped>
 	#stage {
 		display: grid;
-		grid-template-columns: 1fr 2fr;
+		grid-template-columns: 200px 1fr;
 		height: 100dvh;
 	}
 	.kanji-characters {
 		display: flex;
-		gap: 10px;
+		gap: 20px;
 		padding: 20px;
 	}
 	.kanji-meanings {
 		padding-top: 20px;
-		display: flex;
-		align-items: center;
-		flex-direction: column;
 		background-color: #51576d;
+		box-shadow: 3px 0px 5px #0004;
 	}
 </style>
