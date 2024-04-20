@@ -18,6 +18,6 @@
 	html, body {
 		margin: 0;
 		background-color: #303446;
-		color: #fff;
+		color: #232634;
 	}
 </style>

@@ -1,6 +1,14 @@
 <template>
 	<div id="stage">
+		<div id="nice-job-popover" ref="popover">
+			<div id="nice-job-text">
+				ナイス！
+			</div>
+		</div>
 		<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
+			<button class="submit-button" @click.prevent="checkAnswers">
+				Check
+			</button>
 			<KanjiMeaning 
 				v-for="meaning in modelData.meanings" 
 				:key="meaning" 
@@ -8,27 +16,33 @@
 				:attachedCharacter="''"
 			/>
 		</section>
-		<section class="kanji-characters">
-			<KanjiContainer 
-				v-for="kanji in modelData.characters" 
-				:key="kanji.kanji" 
-				:kanji="kanji.kanji" 
-				:attachedMeaning="kanji.attachedMeaning"
-				@dropmeaning="processDrop"/>
+		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
+			<div class="kanji-characters">
+				<KanjiContainer 
+					v-for="kanji in modelData.characters" 
+					:key="kanji.kanji" 
+					:kanji="kanji.kanji" 
+					:attachedMeaning="kanji.attachedMeaning"
+					:incorrect="kanji.incorrect"
+					@dropmeaning="processDrop"
+				/>
+			</div>
 		</section>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { ref, reactive, inject, computed, watch } from 'vue'
+	import { ref, reactive, inject, computed, watch, onMounted } from 'vue'
 	import { buildLimitedKanjiSet, getRandomKanjiSet } from '@/utils/utils'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 
 	const allKanji = inject('kanji')
 	const levelLimit = 14
-	const kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
-	const selectedKanji = reactive(getRandomKanjiSet(kanjiList))
+	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
+	let selectedKanji = reactive(getRandomKanjiSet(kanjiList))
+	const dragPreview = ref(null)
+	const popover = ref(null)
 	const shuffledKanjiList = computed(() => {
 		let list = []
 		selectedKanji.similar_kanji.forEach(sk => list.push(sk))
@@ -37,23 +51,28 @@
 		return list
 	})
 	const modelData = reactive({
-		meanings: shuffledKanjiList.value.map(k => k.meaning),
-		characters: shuffledKanjiList.value.map(k => {
+		meanings: shuffle(shuffledKanjiList.value.map(k => k.meaning)),
+		characters: shuffle(shuffledKanjiList.value.map(k => {
 			return {
 				kanji: k.character,
-				attachedMeaning: ""
+				correctMeaning: k.meaning,
+				attachedMeaning: "",
+				incorrect: null
 			}
-		})
+		}))
 	})
 
 	watch(shuffledKanjiList, (newValue, oldValue) => {
-		modelData.meanings = shuffledKanjiList.value.map(k => k.meaning);
-		modelData.characters = newValue.map(k => {
+		
+		modelData.meanings = shuffle(shuffledKanjiList.value.map(k => k.meaning));
+		modelData.characters = shuffle(newValue.map(k => {
 			return {
 				kanji: k.character,
-				attachedMeaning: null
+				correctMeaning: k.meaning,
+				attachedMeaning: null,
+				incorrect: null
 			}
-		});
+		}))
 	})
 
 	function meaningSectionDropHandler(e) {
@@ -66,8 +85,30 @@
 		})
 	}
 
+	function checkAnswers() {
+		let allAnswersCorrect = true
+		modelData.characters.forEach(character => {
+			let correct = character.correctMeaning == character.attachedMeaning
+			if(!correct) {
+				allAnswersCorrect = false
+			}
+			character.incorrect = !correct
+		})
+
+		if(allAnswersCorrect) {
+			popover.value.style.pointerEvents = 'initial'
+			popover.value.style.opacity = 1
+			setTimeout(() => {
+				getNextKanjiSet()
+				setTimeout(() => {
+					popover.value.style.pointerEvents = 'none'
+					popover.value.style.opacity = 0
+				}, 500)
+			}, 250)
+		}
+	}
+
 	function processDrop(e) {
-		console.dir(e)
 		const { goingToCharacter, comingFromCharacter, oldMeaning, newMeaning  } = e
 		if(goingToCharacter === "MEANINGZONE") {
 			//Ignore drop if picked up and dropped in meaning zone
@@ -113,12 +154,14 @@
 			[array[currentIndex], array[randomIndex]] = [
 				array[randomIndex], array[currentIndex]];
 		}
+		return array
 	}
 	function resetKanjiList() {
-		selectedKanji.value = buildLimitedKanjiSet(allKanji, levelLimit)
+		Object.assign(kanjiList, buildLimitedKanjiSet(allKanji, levelLimit))
 	}
 	function getNextKanjiSet() {
-		selectedKanji.value = getRandomKanjiSet(kanjiList)
+		Object.assign(selectedKanji, getRandomKanjiSet(kanjiList))
+		console.log(`${kanjiList.length} kanji left`)
 	}
 </script>
 
@@ -128,15 +171,54 @@
 		grid-template-columns: 200px 1fr;
 		height: 100dvh;
 	}
+	.kanji-characters-container {
+		height: 100%;
+	}
 	.kanji-characters {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: flex-start;
 		gap: 20px;
 		padding: 20px;
+		height: fit-content;
 	}
 	.kanji-meanings {
 		padding-top: 20px;
 		background-color: #51576d;
 		box-shadow: 3px 0px 5px #0004;
+	}
+	.submit-button {
+		all: unset;
+		display: block;
+		margin: auto;
+		margin-bottom: 20px;
+		width: 150px;
+		height: 50px;
+		text-align: center;
+		border-radius: 10px;
+		font-size: 20px;
+		background-color: #babbf1;
+		box-shadow: 3px 0px 5px #0004;
+	}
+	.submit-button:hover {
+		cursor: pointer;
+		background-color: #cacbff;
+	}
+	#nice-job-popover {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background-color: #000d;
+		color: #c6d0f5;
+		font-size: 80px;
+		font-weight: bold;
+		display: grid;
+		grid-template-rows: 1fr 1fr;
+		place-items: center;
+		opacity: 0;
+		pointer-events: none;
+		user-select: none;
+		transition: opacity 0.25s;
+		z-index: 5;
 	}
 </style>

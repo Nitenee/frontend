@@ -1,11 +1,11 @@
 <template>
-	<div class="kanji" @drop.prevent="onDrop" @dragover.prevent>
-		<KanjiCharacter :character="kanji" />
+	<div class="kanji" @drop.prevent.stop="onDrop" @dragover.prevent>
+		<KanjiCharacter :character="kanji" :incorrect="incorrect" />
 		<div 
 			class="meaning-drop-zone"
 		>
 			<KanjiMeaning 
-				v-if="attachedMeaning != ''"
+				v-if="attachedMeaning"
 				:meaning="attachedMeaning" 
 				:attachedCharacter="kanji"
 			/>
@@ -19,7 +19,11 @@
 	import KanjiMeaning   from '@/components/KanjiMeaning.vue'
 	import { Kanji } from '@/utils/utils'
 
-	const props = defineProps({ kanji: Kanji, attachedMeaning: String })
+	const props = defineProps({
+		kanji: Kanji,
+		attachedMeaning: String,
+		incorrect: Boolean
+	})
 	const emit  = defineEmits(['dropmeaning'])
 
 	function onDrop(e) {

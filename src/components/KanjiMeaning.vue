@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang='ts'>
-	import { defineProps, computed } from 'vue'
+	import { defineProps, inject, computed, ref } from 'vue'
 	const props = defineProps({
 		meaning: String,
 		attachedCharacter: String
@@ -41,6 +41,9 @@
 		margin: auto;
 		width: 100px;
 	}
+	.container:hover {
+		cursor: grab;
+	}
 	.meaning {
 		margin-bottom: 20px;
 		position: relative;
@@ -49,7 +52,6 @@
 		justify-content: center;
 		width: 100px;
 		background-color: #81c8be;
-		color: #232634;
 		font-size: 20px;
 		border-bottom-left-radius: 10px;
 		border-bottom-right-radius: 10px;
