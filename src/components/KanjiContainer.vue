@@ -1,43 +1,37 @@
 <template>
 	<div class="kanji">
-		<KanjiCharacter :character="kanji.character" />
+		<KanjiCharacter :character="kanji" />
 		<div 
-			ref="dropzone"
 			class="meaning-drop-zone"
-			@drop="drop"
-			@dragover="allowDrop"
-		></div>
+			@drop.prevent="onDrop"
+			@dragover.prevent
+		>
+			<KanjiMeaning 
+				v-if="attachedMeaning != ''"
+				:meaning="attachedMeaning" 
+				:attachedCharacter="kanji"
+			/>
+		</div>
 	</div>
 </template>
 
 <script setup lang='ts'>
-	import { defineProps, ref } from 'vue'
+	import { defineProps, defineEmits, ref } from 'vue'
 	import KanjiCharacter from '@/components/KanjiCharacter.vue'
+	import KanjiMeaning   from '@/components/KanjiMeaning.vue'
 	import { Kanji } from '@/utils/utils'
 
-	let dropzone = ref(null)
-	let attachedMeaning = ref("")
+	const props = defineProps({ kanji: Kanji, attachedMeaning: String })
+	const emit  = defineEmits(['dropmeaning'])
 
-	defineProps({
-		kanji: Kanji
-	})
-
-	function allowDrop(e) {
-		e.preventDefault()
-	}
-
-	function drop(e) {
-		e.preventDefault()
-		let oldData = attachedMeaning.value
-		let data = e.dataTransfer.getData("text")
-		let inElement = document.getElementById(`meaning-node-${data}`)
-		attachedMeaning.value = data
-		dropzone.value.appendChild(inElement)
-		if(oldData) {
-			console.log(oldData, attachedMeaning.value)
-			let oldElement = document.getElementById(`meaning-node-${oldData}`)
-			document.getElementsByClassName('kanji-meanings')[0].appendChild(oldElement)
-		}
+	function onDrop(e) {
+		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
+		emit('dropmeaning', {
+			goingToCharacter: props.kanji,
+			comingFromCharacter: attachedCharacter,
+			oldMeaning: props.attachedMeaning,
+			newMeaning: meaning
+		})
 	}
 </script>
 

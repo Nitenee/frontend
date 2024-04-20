@@ -1,6 +1,6 @@
 <template>
 	<div :id="`meaning-node-${meaning}`" class="container">
-		<div draggable=true @dragstart="drag">
+		<div draggable=true @dragstart="onDrag">
 			<div class="puzzle-hole-container">
 				<div class="puzzle-hole">
 					<div class="puzzle-hole-shadow-hider"></div>
@@ -16,12 +16,16 @@
 <script setup lang='ts'>
 	import { defineProps } from 'vue'
 	const props = defineProps({
-		meaning: String
+		meaning: String,
+		attachedCharacter: String
 	});	
 
-	function drag(e) {
-		console.log('begin drag for ' + props.meaning)
-		e.dataTransfer.setData("text", props.meaning)
+	function onDrag(e) {
+		e.dataTransfer.setData("text", JSON.stringify({ 
+				meaning: props.meaning,
+				attachedCharacter: props.attachedCharacter
+			})
+		) // Second property is character the meaning is currently attached to
 	}
 </script>
 
