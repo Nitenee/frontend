@@ -1,10 +1,8 @@
 <template>
-	<div class="kanji">
+	<div class="kanji" @drop.prevent="onDrop" @dragover.prevent>
 		<KanjiCharacter :character="kanji" />
 		<div 
 			class="meaning-drop-zone"
-			@drop.prevent="onDrop"
-			@dragover.prevent
 		>
 			<KanjiMeaning 
 				v-if="attachedMeaning != ''"
@@ -41,9 +39,9 @@
 		flex-direction: column;
 	}
 	.meaning-drop-zone {
+		margin-top: -32px;
 		height: 100px;
 		width: 100px;
-		transform: translateY(-32px);
 		z-index: 1;
 	}
 </style>

@@ -2,7 +2,7 @@
 	<div :id="`meaning-node-${meaning}`" class="container">
 		<div draggable=true @dragstart="onDrag">
 			<div class="puzzle-hole-container">
-				<div class="puzzle-hole">
+				<div :class="puzzleHoleClasses">
 					<div class="puzzle-hole-shadow-hider"></div>
 				</div>
 			</div>
@@ -14,11 +14,18 @@
 </template>
 
 <script setup lang='ts'>
-	import { defineProps } from 'vue'
+	import { defineProps, computed } from 'vue'
 	const props = defineProps({
 		meaning: String,
 		attachedCharacter: String
 	});	
+	const puzzleHoleClasses = computed(() => {
+		const classes = ['puzzle-hole']
+		if(props.attachedCharacter) {
+			classes.push('no-shadow')
+		}
+		return classes.join(' ')
+	})
 
 	function onDrag(e) {
 		e.dataTransfer.setData("text", JSON.stringify({ 
@@ -66,6 +73,9 @@
 		border-top-right-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
 		z-index: 1;
+	}
+	.no-shadow {
+		box-shadow: initial;
 	}
 	.puzzle-hole::before {
 		position: absolute;
