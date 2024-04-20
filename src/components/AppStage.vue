@@ -6,15 +6,21 @@
 			</div>
 		</div>
 		<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
-			<button class="submit-button" @click.prevent="checkAnswers">
-				Check
-			</button>
-			<KanjiMeaning 
-				v-for="meaning in modelData.meanings" 
-				:key="meaning" 
-				:meaning="meaning" 
-				:attachedCharacter="''"
-			/>
+			<div class="button-container">
+				<div>
+					<button class="submit-button" @click.prevent="checkAnswers">
+						Check
+					</button>
+				</div>
+			</div>
+			<div class="kanji-meaning-items-container">
+				<KanjiMeaning 
+					v-for="meaning in modelData.meanings" 
+					:key="meaning" 
+					:meaning="meaning" 
+					:attachedCharacter="''"
+				/>
+			</div>
 		</section>
 		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
 			<div class="kanji-characters">
@@ -39,20 +45,24 @@
 
 	const allKanji = inject('kanji')
 	const levelLimit = 14
-	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
-	let selectedKanji = reactive(getRandomKanjiSet(kanjiList))
+	const batchSize = 5
 	const dragPreview = ref(null)
 	const popover = ref(null)
-	const shuffledKanjiList = computed(() => {
+	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
+	let selectedKanji = reactive(getRandomKanjiSet(kanjiList, batchSize))
+	const selectedKanjiList = computed(() => {
 		let list = []
-		selectedKanji.similar_kanji.forEach(sk => list.push(sk))
-		list.push(selectedKanji)
-		shuffle(list)
+		selectedKanji.forEach(sk => {
+			sk.forEach(sk2 => {
+				sk2.similar_kanji.forEach(sk3 => list.push(sk3))
+				list.push(sk2)
+			})
+		})
 		return list
 	})
 	const modelData = reactive({
-		meanings: shuffle(shuffledKanjiList.value.map(k => k.meaning)),
-		characters: shuffle(shuffledKanjiList.value.map(k => {
+		meanings: shuffle(selectedKanjiList.value.map(k => k.meaning)),
+		characters: shuffle(selectedKanjiList.value.map(k => {
 			return {
 				kanji: k.character,
 				correctMeaning: k.meaning,
@@ -62,9 +72,8 @@
 		}))
 	})
 
-	watch(shuffledKanjiList, (newValue, oldValue) => {
-		
-		modelData.meanings = shuffle(shuffledKanjiList.value.map(k => k.meaning));
+	watch(selectedKanjiList, (newValue, oldValue) => {
+		modelData.meanings = shuffle(selectedKanjiList.value.map(k => k.meaning));
 		modelData.characters = shuffle(newValue.map(k => {
 			return {
 				kanji: k.character,
@@ -160,7 +169,7 @@
 		Object.assign(kanjiList, buildLimitedKanjiSet(allKanji, levelLimit))
 	}
 	function getNextKanjiSet() {
-		Object.assign(selectedKanji, getRandomKanjiSet(kanjiList))
+		Object.assign(selectedKanji, getRandomKanjiSet(kanjiList, batchSize))
 		console.log(`${kanjiList.length} kanji left`)
 	}
 </script>
@@ -170,6 +179,7 @@
 		display: grid;
 		grid-template-columns: 200px 1fr;
 		height: 100dvh;
+		overflow: hidden;
 	}
 	.kanji-characters-container {
 		height: 100%;
@@ -183,22 +193,48 @@
 		height: fit-content;
 	}
 	.kanji-meanings {
-		padding-top: 20px;
+		height: 100dvh;
 		background-color: #51576d;
 		box-shadow: 3px 0px 5px #0004;
+	}
+	.kanji-meaning-items-container {
+		position: relative;
+		height: calc(100% - 110px);
+		padding-top: 20px;
+		overflow-y: auto;
+		scrollbar-gutter: stable both-edges;
+		scrollbar-color: #838ba7 #626880;
+		scrollbar-width: thin;
+		background-color: #414559;
+	}
+	.button-container {
+		position: relative;
+		z-index: 10;
+		padding-top: 10px;
+		padding-bottom: 20px;
+		box-shadow: 0px 2px 4px #000a;
+}
+	.button-container div {
+		margin: auto;
+		display: flex;
+		align-items: center;
+		width: 90%;
+		height: 80px;
+		background-color: #414559;
+		border-radius: 10px;
+		box-shadow: 2px 2px 2px #0004;
 	}
 	.submit-button {
 		all: unset;
 		display: block;
 		margin: auto;
-		margin-bottom: 20px;
 		width: 150px;
 		height: 50px;
 		text-align: center;
 		border-radius: 10px;
 		font-size: 20px;
 		background-color: #babbf1;
-		box-shadow: 3px 0px 5px #0004;
+		box-shadow: 2px 2px 2px #0004;
 	}
 	.submit-button:hover {
 		cursor: pointer;
