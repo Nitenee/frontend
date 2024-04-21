@@ -1,5 +1,5 @@
 <template>
-	<div :id="`meaning-node-${meaning}`" class="container">
+	<div :id="`meaning-node-${meaning}`" class="container" :class="attached">
 		<div draggable=true @dragstart="onDrag">
 			<div class="puzzle-hole-container">
 				<div :class="puzzleHoleClasses">
@@ -26,6 +26,13 @@
 		}
 		return classes.join(' ')
 	})
+	const attached = computed(() => {
+		if(props.attachedCharacter) {
+			return "attached"
+		} else {
+			return ""
+		}
+	})
 
 	function onDrag(e) {
 		e.dataTransfer.setData("text", JSON.stringify({ 
@@ -40,9 +47,14 @@
 	.container {
 		margin: auto;
 		width: 100px;
+		transition: translate 0.3s;
 	}
 	.container:hover {
 		cursor: grab;
+		translate: -2px -2px;
+	}
+	.container.attached:hover {
+		translate: 0px 10px;
 	}
 	.meaning {
 		margin-bottom: 20px;
@@ -57,7 +69,11 @@
 		border-bottom-right-radius: 10px;
 		text-align: center;
 		box-shadow: 2px 2px 2px #0004;
+		transition: box-shadow 0.3s;
 		word-wrap: break-word;
+	}
+	.container:hover .meaning {
+		box-shadow: 4px 4px 4px #0004;
 	}
 	.meaning span {
 		width: 100%;
@@ -75,9 +91,10 @@
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
+		transition: box-shadow 0.3s;
 		z-index: 1;
 	}
-	.no-shadow {
+	.container:not(:hover) .no-shadow {
 		box-shadow: initial;
 	}
 	.puzzle-hole::before {
