@@ -1,10 +1,29 @@
 <template>
-	<div id="stage">
+	<div id="stage" :class="toggleSettingsStyle">
 		<div id="nice-job-popover" ref="popover">
 			<div id="nice-job-text">
 				ナイス！
 			</div>
 		</div>
+		<nav>
+			<div class="app-name">
+				<div>似</div>
+				<div>合</div>
+				<div>い</div>
+				<div>じ</div>
+				<div>ゃ</div>
+				<div>ね</div>
+				<div>ー</div>
+				<div>！</div>
+			</div>
+			<div class="settings-button-container">
+				<button class="settings-button" @click.prevent="toggleSettings">
+					<svg height="35px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="35px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+						<path d="M424.5,216.5h-15.2c-12.4,0-22.8-10.7-22.8-23.4c0-6.4,2.7-12.2,7.5-16.5l9.8-9.6c9.7-9.6,9.7-25.3,0-34.9l-22.3-22.1  c-4.4-4.4-10.9-7-17.5-7c-6.6,0-13,2.6-17.5,7l-9.4,9.4c-4.5,5-10.5,7.7-17,7.7c-12.8,0-23.5-10.4-23.5-22.7V89.1  c0-13.5-10.9-25.1-24.5-25.1h-30.4c-13.6,0-24.4,11.5-24.4,25.1v15.2c0,12.3-10.7,22.7-23.5,22.7c-6.4,0-12.3-2.7-16.6-7.4l-9.7-9.6  c-4.4-4.5-10.9-7-17.5-7s-13,2.6-17.5,7L110,132c-9.6,9.6-9.6,25.3,0,34.8l9.4,9.4c5,4.5,7.8,10.5,7.8,16.9  c0,12.8-10.4,23.4-22.8,23.4H89.2c-13.7,0-25.2,10.7-25.2,24.3V256v15.2c0,13.5,11.5,24.3,25.2,24.3h15.2  c12.4,0,22.8,10.7,22.8,23.4c0,6.4-2.8,12.4-7.8,16.9l-9.4,9.3c-9.6,9.6-9.6,25.3,0,34.8l22.3,22.2c4.4,4.5,10.9,7,17.5,7  c6.6,0,13-2.6,17.5-7l9.7-9.6c4.2-4.7,10.2-7.4,16.6-7.4c12.8,0,23.5,10.4,23.5,22.7v15.2c0,13.5,10.8,25.1,24.5,25.1h30.4  c13.6,0,24.4-11.5,24.4-25.1v-15.2c0-12.3,10.7-22.7,23.5-22.7c6.4,0,12.4,2.8,17,7.7l9.4,9.4c4.5,4.4,10.9,7,17.5,7  c6.6,0,13-2.6,17.5-7l22.3-22.2c9.6-9.6,9.6-25.3,0-34.9l-9.8-9.6c-4.8-4.3-7.5-10.2-7.5-16.5c0-12.8,10.4-23.4,22.8-23.4h15.2  c13.6,0,23.3-10.7,23.3-24.3V256v-15.2C447.8,227.2,438.1,216.5,424.5,216.5z M336.8,256L336.8,256c0,44.1-35.7,80-80,80  c-44.3,0-80-35.9-80-80l0,0l0,0c0-44.1,35.7-80,80-80C301.1,176,336.8,211.9,336.8,256L336.8,256z"/>
+					</svg>
+				</button>
+			</div>
+		</nav>
 		<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
 			<div class="button-container">
 				<div>
@@ -38,6 +57,7 @@
 				/>
 			</div>
 		</section>
+		<SettingsPanel />
 	</div>
 </template>
 
@@ -59,13 +79,22 @@
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
+	import SettingsPanel from '@/components/SettingsPanel.vue'
 
 	const allKanji = inject('kanji')
 	const levelLimit = 14
-	const batchSize = 5
+	const batchSize = 1
 	const group = true
 	const dragPreview = ref(null)
 	const popover = ref(null)
+	const showSettings = ref(true)
+	const toggleSettingsStyle = computed(() => {
+		if(showSettings.value) {
+			return "showSettings"
+		} else {
+			return ""
+		}
+	})
 	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
 	let selectedKanji = reactive(getRandomKanjiSet(kanjiList, batchSize))
 	const selectedKanjiList = computed(() => {
@@ -225,18 +254,91 @@
 		Object.assign(selectedKanji, getRandomKanjiSet(kanjiList, batchSize))
 		console.log(`${kanjiList.length} kanji left`)
 	}
+
+	function toggleSettings() {
+		showSettings.value = !showSettings.value
+	}
 </script>
 
 <style scoped>
 	#stage {
 		display: grid;
-		grid-template-columns: 200px 1fr;
+		grid-template-rows: 60px 1fr;
+		grid-template-columns: 200px 1fr 0;
 		height: calc(100dvh - 4px);
 		overflow: hidden;
+		transition: grid-template-columns 1s ease-in-out;
+	}
+	#stage.showSettings {
+		grid-template-columns: 200px 1fr 300px;
+	}
+	nav {
+		grid-column: span 3;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.app-name {
+		margin-left: 10px;
+		display: flex;
+		user-select: none;
+		font-family: 'MikanNoki';
+		font-size: 50px;
+		font-weight: bold;
+		color: #c6d0f5;
+		-webkit-text-stroke: 1.5pt #303446;
+		text-shadow: 2px 2px 2px #0007;
+		letter-spacing: -10px;
+	}
+	.app-name div:nth-child(odd) {
+		translate: 0 -5px;
+	}
+	.app-name div:nth-child(even) {
+		translate: 0 5px;
+	}
+	.app-name div:nth-child(7) {
+		translate: 0 0px;
+	}
+	.settings-button-container {
+		margin-right: 10px;
+		display: flex;
+		width: 80px;
+		height: 50px;
+		padding: 5px 10px;
+		align-items: center;
+		justify-content: center;
+		background-color: #414559;
+		border-radius: 10px;
+		box-shadow: 2px 2px 2px #0004;
+	}
+	.settings-button {
+		all: unset;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: auto;
+		width: 150px;
+		height: 35px;
+		border-radius: 5px;
+		font-size: 20px;
+		background-color: #737994;
+		box-shadow: 2px 2px 2px #0004;
+	}
+	.settings-button:hover {
+		background-color: #838ba7;
+		cursor: pointer;
+	}
+	.settings-button svg {
+		fill: #c6d0f5;
+		transition: rotate 0.3s, fill 0.3s;
+		filter: drop-shadow(1px 1px #0007);
+	}
+	.settings-button:hover svg {
+		rotate: 90deg;
 	}
 	.kanji-characters-container {
 		position: relative;
-		height: calc(100% - 4px);
+		height: calc(100% - 64px);
 		box-shadow: inset 0px 0px 2px 2px #0007;
 		background-color: #303446;
 	}
@@ -253,7 +355,7 @@
 		scrollbar-width: thin;
 	}
 	.kanji-meanings {
-		height: calc(100dvh - 4px);
+		height: calc(100dvh - 64px);
 		background-color: #51576d;
 	}
 	.kanji-meaning-items-container {
@@ -292,7 +394,7 @@
 		width: 150px;
 		height: 50px;
 		text-align: center;
-		border-radius: 10px;
+		border-radius: 5px;
 		font-size: 20px;
 		background-color: #babbf1;
 		box-shadow: 2px 2px 2px #0004;
