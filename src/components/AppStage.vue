@@ -38,6 +38,18 @@
 </template>
 
 <script setup lang="ts">
+	/*
+		FIX:
+    Some items are being added in multiple times. Likely need to use a Set and make sure things are unique. Also could potentially have multiple meanings that are the same. Need to check this.
+		FIX:
+		Meanings not breaking mid word correctly
+		TODO:
+		Connect to backend and use database instead of loading JSON in frontend
+		TODO:
+		Add option to input WaniKani API key to sync with WaniKani level 
+		TODO:
+		Add options to manually choose upper and lower level limits 
+	*/
 	import { ref, reactive, inject, computed, watch, onMounted } from 'vue'
 	import { buildLimitedKanjiSet, getRandomKanjiSet } from '@/utils/utils'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
@@ -166,9 +178,14 @@
 		return array
 	}
 	function resetKanjiList() {
+		console.log(`Kanji list length is ${kanjiList.length}. Resetting kanji list`)
 		Object.assign(kanjiList, buildLimitedKanjiSet(allKanji, levelLimit))
+		console.log(`Kanji list length is now ${kanjiList.length}.`)
 	}
 	function getNextKanjiSet() {
+		if(kanjiList.length <= 0) {
+			resetKanjiList()
+		}
 		Object.assign(selectedKanji, getRandomKanjiSet(kanjiList, batchSize))
 		console.log(`${kanjiList.length} kanji left`)
 	}
@@ -191,6 +208,11 @@
 		gap: 20px;
 		padding: 20px;
 		height: fit-content;
+		max-height: 100dvh;
+		overflow-y: auto;
+		scrollbar-gutter: stable both-edges;
+		scrollbar-color: #838ba7 #626880;
+		scrollbar-width: thin;
 	}
 	.kanji-meanings {
 		height: 100dvh;
