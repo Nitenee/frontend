@@ -209,13 +209,14 @@
 	#stage {
 		display: grid;
 		grid-template-columns: 200px 1fr;
-		height: 100dvh;
+		height: calc(100dvh - 4px);
 		overflow: hidden;
 	}
 	.kanji-characters-container {
 		position: relative;
-		height: 100%;
+		height: calc(100% - 4px);
 		box-shadow: inset 0px 0px 2px 2px #0007;
+		background-color: #303446;
 	}
 	.kanji-characters {
 		display: flex;
@@ -230,7 +231,7 @@
 		scrollbar-width: thin;
 	}
 	.kanji-meanings {
-		height: 100dvh;
+		height: calc(100dvh - 4px);
 		background-color: #51576d;
 	}
 	.kanji-meaning-items-container {

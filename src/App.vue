@@ -19,5 +19,11 @@
 		margin: 0;
 		background-color: #303446;
 		color: #232634;
+		overflow: hidden;
+	}
+	main {
+		padding: 2px;
+		background-color: #51576d;
+		overflow: hidden;
 	}
 </style>
