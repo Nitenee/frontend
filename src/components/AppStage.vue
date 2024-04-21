@@ -14,15 +14,19 @@
 				</div>
 			</div>
 			<div class="kanji-meaning-items-container">
-				<KanjiMeaning 
-					v-for="meaning in modelData.meanings" 
-					:key="meaning" 
-					:meaning="meaning" 
-					:attachedCharacter="''"
-				/>
+				<RoundedCorners hideBottomRight="true" hideTopRight="true" />
+				<div>
+					<KanjiMeaning 
+						v-for="meaning in modelData.meanings" 
+						:key="meaning" 
+						:meaning="meaning" 
+						:attachedCharacter="''"
+					/>
+				</div>
 			</div>
 		</section>
 		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
+			<RoundedCorners hideBottomLeft="true" />
 			<div class="kanji-characters">
 				<KanjiContainer 
 					v-for="kanji in modelData.characters" 
@@ -54,10 +58,11 @@
 	import { buildLimitedKanjiSet, getRandomKanjiSet } from '@/utils/utils'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
+	import RoundedCorners from '@/components/RoundedCorners.vue'
 
 	const allKanji = inject('kanji')
-	const levelLimit = 80
-	const batchSize = 200
+	const levelLimit = 14
+	const batchSize = 5
 	const dragPreview = ref(null)
 	const popover = ref(null)
 	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
@@ -208,7 +213,9 @@
 		overflow: hidden;
 	}
 	.kanji-characters-container {
+		position: relative;
 		height: 100%;
+		box-shadow: inset 0px 0px 2px 2px #0007;
 	}
 	.kanji-characters {
 		display: flex;
@@ -216,8 +223,7 @@
 		align-items: flex-start;
 		gap: 20px;
 		padding: 20px;
-		height: fit-content;
-		max-height: 100dvh;
+		height: 100dvh;
 		overflow-y: auto;
 		scrollbar-gutter: stable both-edges;
 		scrollbar-color: #838ba7 #626880;
@@ -226,25 +232,26 @@
 	.kanji-meanings {
 		height: 100dvh;
 		background-color: #51576d;
-		box-shadow: 3px 0px 5px #0004;
 	}
 	.kanji-meaning-items-container {
 		position: relative;
 		height: calc(100% - 110px);
+		background-color: #414559;
+		box-shadow: inset 0px 0px 2px 2px #0007;
+	}
+	.kanji-meaning-items-container > div {
+		height: 100%;
 		padding-top: 20px;
-		overflow-y: auto;
-		scrollbar-gutter: stable both-edges;
+		overflow-y: scroll;
 		scrollbar-color: #838ba7 #626880;
 		scrollbar-width: thin;
-		background-color: #414559;
 	}
 	.button-container {
 		position: relative;
 		z-index: 10;
 		padding-top: 10px;
 		padding-bottom: 20px;
-		box-shadow: 0px 2px 4px #000a;
-}
+	}
 	.button-container div {
 		margin: auto;
 		display: flex;
