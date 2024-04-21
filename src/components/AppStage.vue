@@ -63,6 +63,7 @@
 	const allKanji = inject('kanji')
 	const levelLimit = 14
 	const batchSize = 5
+	const group = true
 	const dragPreview = ref(null)
 	const popover = ref(null)
 	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
@@ -70,32 +71,53 @@
 	const selectedKanjiList = computed(() => {
 		let seen = new Set()
 		let list = []
-		selectedKanji.forEach(sk => {
-			sk.forEach(sk2 => {
-				sk2.similar_kanji.forEach(sk3 => {
-					if(!seen.has(sk3.character)) {
-						list.push(sk3)
-						seen.add(sk3.character)
+		if(group) {
+			selectedKanji.forEach(sk => {
+				let innerList = []
+				sk.forEach(sk2 => {
+					sk2.similar_kanji.forEach(sk3 => {
+						if(!seen.has(sk3.character)) {
+							innerList.push(sk3)
+							seen.add(sk3.character)
+						}
+					})
+					if(!seen.has(sk2.character)) {
+						innerList.push(sk2)
+						seen.add(sk2.character)
 					}
 				})
-				if(!seen.has(sk2.character)) {
-					list.push(sk2)
-					seen.add(sk2.character)
-				}
+				shuffle(innerList)
+				list = [...list, ...innerList]
 			})
-		})
-		return list
+			return list
+		} else {
+			selectedKanji.forEach(sk => {
+				sk.forEach(sk2 => {
+					sk2.similar_kanji.forEach(sk3 => {
+						if(!seen.has(sk3.character)) {
+							list.push(sk3)
+							seen.add(sk3.character)
+						}
+					})
+					if(!seen.has(sk2.character)) {
+						list.push(sk2)
+						seen.add(sk2.character)
+					}
+				})
+			})
+			return shuffle(list)
+		}
 	})
 	const modelData = reactive({
 		meanings: shuffle(selectedKanjiList.value.map(k => k.meaning)),
-		characters: shuffle(selectedKanjiList.value.map(k => {
+		characters: selectedKanjiList.value.map(k => {
 			return {
 				kanji: k.character,
 				correctMeaning: k.meaning,
 				attachedMeaning: "",
 				incorrect: null
 			}
-		}))
+		})
 	})
 
 	watch(selectedKanjiList, (newValue, oldValue) => {
@@ -283,7 +305,7 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
-		background-color: #000d;
+		background-color: #000e;
 		color: #c6d0f5;
 		font-size: 80px;
 		font-weight: bold;
