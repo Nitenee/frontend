@@ -6,7 +6,7 @@
 					<div class="puzzle-hole-shadow-hider"></div>
 				</div>
 			</div>
-			<div class="meaning">
+			<div class="meaning" lang="en">
 				<span>{{ meaning }}</span>
 			</div>
 		</div>
@@ -52,14 +52,15 @@
 		justify-content: center;
 		width: 100px;
 		background-color: #81c8be;
-		font-size: 20px;
+		font-size: 15px;
 		border-bottom-left-radius: 10px;
 		border-bottom-right-radius: 10px;
-		word-wrap: break-word;
 		text-align: center;
 		box-shadow: 2px 2px 2px #0004;
+		word-wrap: break-word;
 	}
 	.meaning span {
+		width: 100%;
 		user-select: none;
 	}
 	.puzzle-hole-container {

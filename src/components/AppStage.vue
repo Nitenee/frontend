@@ -56,18 +56,27 @@
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 
 	const allKanji = inject('kanji')
-	const levelLimit = 14
-	const batchSize = 5
+	const levelLimit = 80
+	const batchSize = 200
 	const dragPreview = ref(null)
 	const popover = ref(null)
 	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
 	let selectedKanji = reactive(getRandomKanjiSet(kanjiList, batchSize))
 	const selectedKanjiList = computed(() => {
+		let seen = new Set()
 		let list = []
 		selectedKanji.forEach(sk => {
 			sk.forEach(sk2 => {
-				sk2.similar_kanji.forEach(sk3 => list.push(sk3))
-				list.push(sk2)
+				sk2.similar_kanji.forEach(sk3 => {
+					if(!seen.has(sk3.character)) {
+						list.push(sk3)
+						seen.add(sk3.character)
+					}
+				})
+				if(!seen.has(sk2.character)) {
+					list.push(sk2)
+					seen.add(sk2.character)
+				}
 			})
 		})
 		return list
