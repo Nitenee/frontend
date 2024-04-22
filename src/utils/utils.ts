@@ -17,7 +17,7 @@ export interface Kanji {
 	similar_kanji?: Kanji[]
 }
 
-export function buildLimitedKanjiSet(kanjiList: KanjiList, levelLimit = 80): Kanji[] {
+export function buildLimitedKanjiSet(kanjiList: KanjiList, levelLimit = 60): Kanji[] {
 	kanjiList = structuredClone(kanjiList)
 	//Filter kanji by level, including similar subject id's, then add the similar kanji to a new field on the object
 	for(const k of Object.values(kanjiList)) {

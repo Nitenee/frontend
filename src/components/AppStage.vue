@@ -2,16 +2,13 @@
 	<div id="stage" :class="toggleSettingsStyle">
 		<div id="nice-job-popover" ref="popover">
 			<div id="nice-job-text">
-				ナイス！
+				{{ popoverText }}
 			</div>
 		</div>
 		<nav>
 			<div class="app-name">
 				<div>似</div>
-				<div>合</div>
-				<div>い</div>
-				<div>じ</div>
-				<div>ゃ</div>
+				<div>て</div>
 				<div>ね</div>
 				<div>ー</div>
 				<div>！</div>
@@ -57,7 +54,7 @@
 				/>
 			</div>
 		</section>
-		<SettingsPanel />
+		<SettingsPanel @settingsUpdated="updateSettings"/>
 	</div>
 </template>
 
@@ -81,12 +78,13 @@
 	import RoundedCorners from '@/components/RoundedCorners.vue'
 	import SettingsPanel from '@/components/SettingsPanel.vue'
 
+	let levelLimit = ref(60)
+	let batchSize = ref(5)
+	let group = ref(true)
 	const allKanji = inject('kanji')
-	const levelLimit = 14
-	const batchSize = 1
-	const group = true
-	const dragPreview = ref(null)
+	console.log('kanji: ', allKanji)
 	const popover = ref(null)
+	const popoverText = ref("")
 	const showSettings = ref(true)
 	const toggleSettingsStyle = computed(() => {
 		if(showSettings.value) {
@@ -95,13 +93,13 @@
 			return ""
 		}
 	})
-	let kanjiList = reactive(buildLimitedKanjiSet(allKanji, levelLimit))
-	let selectedKanji = reactive(getRandomKanjiSet(kanjiList, batchSize))
+	let kanjiList = ref(buildLimitedKanjiSet(allKanji, levelLimit.value))
+	let selectedKanji = ref(getRandomKanjiSet(kanjiList.value, batchSize.value))
 	const selectedKanjiList = computed(() => {
 		let seen = new Set()
 		let list = []
-		if(group) {
-			selectedKanji.forEach(sk => {
+		if(group.value == true) {
+			selectedKanji.value.forEach(sk => {
 				let innerList = []
 				sk.forEach(sk2 => {
 					sk2.similar_kanji.forEach(sk3 => {
@@ -120,7 +118,7 @@
 			})
 			return list
 		} else {
-			selectedKanji.forEach(sk => {
+			selectedKanji.value.forEach(sk => {
 				sk.forEach(sk2 => {
 					sk2.similar_kanji.forEach(sk3 => {
 						if(!seen.has(sk3.character)) {
@@ -150,7 +148,8 @@
 	})
 
 	watch(selectedKanjiList, (newValue, oldValue) => {
-		modelData.meanings = shuffle(selectedKanjiList.value.map(k => k.meaning));
+		console.log('does newValue == oldValue?', newValue == oldValue, newValue, oldValue)
+		modelData.meanings = shuffle(newValue.map(k => k.meaning));
 		modelData.characters = shuffle(newValue.map(k => {
 			return {
 				kanji: k.character,
@@ -182,16 +181,24 @@
 		})
 
 		if(allAnswersCorrect) {
-			popover.value.style.pointerEvents = 'initial'
-			popover.value.style.opacity = 1
-			setTimeout(() => {
+			showPopup("ナイス！", () => { 
 				getNextKanjiSet()
-				setTimeout(() => {
-					popover.value.style.pointerEvents = 'none'
-					popover.value.style.opacity = 0
-				}, 500)
-			}, 250)
+			})
 		}
+	}
+
+	function showPopup(popupText, functionToRun, long = false) {
+		let time = long ? 500 : 250
+		popoverText.value = popupText
+		popover.value.style.pointerEvents = 'initial'
+		popover.value.style.opacity = 1
+		setTimeout(() => {
+			functionToRun()
+			setTimeout(() => {
+				popover.value.style.pointerEvents = 'none'
+				popover.value.style.opacity = 0
+			}, time * 2)
+		}, time)
 	}
 
 	function processDrop(e) {
@@ -243,20 +250,33 @@
 		return array
 	}
 	function resetKanjiList() {
-		console.log(`Kanji list length is ${kanjiList.length}. Resetting kanji list`)
-		Object.assign(kanjiList, buildLimitedKanjiSet(allKanji, levelLimit))
-		console.log(`Kanji list length is now ${kanjiList.length}.`)
+		kanjiList.value = buildLimitedKanjiSet(allKanji, levelLimit.value)
 	}
 	function getNextKanjiSet() {
-		if(kanjiList.length <= 0) {
+		if(kanjiList.value.length <= 0) {
 			resetKanjiList()
 		}
-		Object.assign(selectedKanji, getRandomKanjiSet(kanjiList, batchSize))
-		console.log(`${kanjiList.length} kanji left`)
+		let newCharacters = getRandomKanjiSet(kanjiList.value, batchSize.value)
+		selectedKanji.value = newCharacters
 	}
 
 	function toggleSettings() {
 		showSettings.value = !showSettings.value
+	}
+
+	function reset() {
+		resetKanjiList()
+		getNextKanjiSet()
+	}
+
+	function updateSettings(newSettings) {
+		batchSize.value = newSettings.batchSize
+		group.value = newSettings.groupKanji
+		levelLimit.value = newSettings.levelLimit.upper
+		showPopup("設定を保存しました！", () => {
+			reset()
+			showSettings.value = false
+		}, true)
 	}
 </script>
 
@@ -267,7 +287,7 @@
 		grid-template-columns: 200px 1fr 0;
 		height: calc(100dvh - 4px);
 		overflow: hidden;
-		transition: grid-template-columns 1s ease-in-out;
+		transition: grid-template-columns 1s cubic-bezier(.75,0,.25,1);
 	}
 	#stage.showSettings {
 		grid-template-columns: 200px 1fr 300px;
@@ -289,6 +309,11 @@
 		-webkit-text-stroke: 1.5pt #303446;
 		text-shadow: 2px 2px 2px #0007;
 		letter-spacing: -10px;
+		transition: translate 0.3s, text-shadow 0.3s;
+	}
+	.app-name:hover {
+		translate: -2px -2px;
+		text-shadow: 4px 4px 8px #0007;
 	}
 	.app-name div:nth-child(odd) {
 		translate: 0 -5px;
@@ -310,6 +335,11 @@
 		background-color: #414559;
 		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
+		transition: translate 0.3s, box-shadow 0.3s;
+	}
+	.settings-button-container:hover {
+		translate: 1px 1px;
+		box-shadow: 1px 1px 1px #0007;
 	}
 	.settings-button {
 		all: unset;
@@ -323,8 +353,11 @@
 		font-size: 20px;
 		background-color: #737994;
 		box-shadow: 2px 2px 2px #0004;
+		transition: translate 0.3s, box-shadow 0.3s;
 	}
 	.settings-button:hover {
+		translate: -2px -2px;
+		box-shadow: 4px 4px 8px #0004;
 		background-color: #838ba7;
 		cursor: pointer;
 	}
@@ -345,7 +378,8 @@
 	.kanji-characters {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: flex-start;
+		align-content: center;
+		justify-content: space-evenly;
 		gap: 20px;
 		padding: 20px;
 		height: 100dvh;
@@ -386,6 +420,11 @@
 		background-color: #414559;
 		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
+		transition: translate 0.3s, box-shadow 0.3s;
+	}
+	.button-container div:has(> .submit-button:hover) {
+		box-shadow: 1px 1px 1px #0007;
+		translate: 1px 1px;
 	}
 	.submit-button {
 		all: unset;
@@ -398,10 +437,13 @@
 		font-size: 20px;
 		background-color: #babbf1;
 		box-shadow: 2px 2px 2px #0004;
+		transition: translate 0.3s, box-shadow 0.3s;
 	}
 	.submit-button:hover {
 		cursor: pointer;
 		background-color: #cacbff;
+		box-shadow: 4px 4px 8px #0004;
+		translate: -2px -2px;
 	}
 	#nice-job-popover {
 		position: absolute;
@@ -418,6 +460,6 @@
 		pointer-events: none;
 		user-select: none;
 		transition: opacity 0.25s;
-		z-index: 5;
+		z-index: 50;
 	}
 </style>
