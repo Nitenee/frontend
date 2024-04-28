@@ -28,6 +28,17 @@
 					</div>
 				</div>
 				<div class="option-container">
+					<div class="option-title">
+						Answer Checking
+					</div>
+					<div class="option-content">
+						<div class="group-kanji">
+							<div class="level-limit-option-title">Auto-Check</div>
+							<input type="checkbox" v-model="autoCheck" />
+						</div>
+					</div>
+				</div>
+				<div class="option-container">
 					<div class="option-title">Level Limits</div>
 					<div class="option-content">
 						<div class="level-limit">
@@ -67,8 +78,9 @@
 
 <script setup lang='ts'>
 	import { ref, computed, defineEmits } from 'vue'
-	const batchSize = ref(5)
+	const batchSize = ref(3)
 	const groupKanji = ref(true)
+	const autoCheck = ref(true)
 	const useWaniKaniLevel = ref(false)
 	const upperLimitDisabled = computed(() => useWaniKaniLevel.value ? "disabled" : "")
 	const levelLimitUpper = ref(60)
@@ -95,6 +107,7 @@
 		emit('settingsUpdated', {
 			batchSize: batchSize.value,
 			groupKanji: groupKanji.value,
+			autoCheck: autoCheck.value,
 			levelLimit: {
 				upper: levelLimitUpper.value, //TODO: Change this to check for WaniKani usage
 				lower: levelLimitLower.value

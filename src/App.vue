@@ -7,8 +7,6 @@
 <script setup lang="ts">
 	import { provide } from 'vue'
 	import AppStage from './components/AppStage.vue'
-	import kanji from './assets/indexed_kanji.json'
-	provide('kanji', kanji)
 </script>
 
 <style>

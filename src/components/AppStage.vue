@@ -2,7 +2,8 @@
 	<div id="stage" :class="toggleSettingsStyle">
 		<div id="nice-job-popover" ref="popover">
 			<div id="nice-job-text">
-				{{ popoverText }}
+				<div>{{ popoverText }}</div>
+				<div>{{ popoverSubtext }}</div>
 			</div>
 		</div>
 		<nav>
@@ -31,7 +32,7 @@
 			</div>
 			<div class="kanji-meaning-items-container">
 				<RoundedCorners hideBottomRight="true" hideTopRight="true" />
-				<div>
+				<div v-if="modelData.meanings.length > 0">
 					<KanjiMeaning 
 						v-for="meaning in modelData.meanings" 
 						:key="meaning" 
@@ -43,7 +44,7 @@
 		</section>
 		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
 			<RoundedCorners hideBottomLeft="true" />
-			<div class="kanji-characters">
+			<div class="kanji-characters" v-if="modelData.characters.length > 0">
 				<KanjiContainer 
 					v-for="kanji in modelData.characters" 
 					:key="kanji.kanji" 
@@ -61,8 +62,6 @@
 <script setup lang="ts">
 	/*
 		FIX:
-    Some items are being added in multiple times. Likely need to use a Set and make sure things are unique. Also could potentially have multiple meanings that are the same. Need to check this.
-		FIX:
 		Meanings not breaking mid word correctly
 		TODO:
 		Connect to backend and use database instead of loading JSON in frontend
@@ -72,19 +71,20 @@
 		Add options to manually choose upper and lower level limits 
 	*/
 	import { ref, reactive, inject, computed, watch, onMounted } from 'vue'
-	import { buildLimitedKanjiSet, getRandomKanjiSet } from '@/utils/utils'
+	import { apiRequest, shuffleArray } from '@/utils/utils'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
 	import SettingsPanel from '@/components/SettingsPanel.vue'
 
-	let levelLimit = ref(60)
-	let batchSize = ref(5)
+	let levelLimitUpper = ref(60)
+	let levelLimitLower = ref(1)
+	let batchSize = ref(3)
 	let group = ref(true)
-	const allKanji = inject('kanji')
-	console.log('kanji: ', allKanji)
+	let autoCheck = ref(true)
 	const popover = ref(null)
 	const popoverText = ref("")
+	const popoverSubtext = ref("")
 	const showSettings = ref(true)
 	const toggleSettingsStyle = computed(() => {
 		if(showSettings.value) {
@@ -93,71 +93,9 @@
 			return ""
 		}
 	})
-	let kanjiList = ref(buildLimitedKanjiSet(allKanji, levelLimit.value))
-	let selectedKanji = ref(getRandomKanjiSet(kanjiList.value, batchSize.value))
-	const selectedKanjiList = computed(() => {
-		let seen = new Set()
-		let list = []
-		if(group.value == true) {
-			selectedKanji.value.forEach(sk => {
-				let innerList = []
-				sk.forEach(sk2 => {
-					sk2.similar_kanji.forEach(sk3 => {
-						if(!seen.has(sk3.character)) {
-							innerList.push(sk3)
-							seen.add(sk3.character)
-						}
-					})
-					if(!seen.has(sk2.character)) {
-						innerList.push(sk2)
-						seen.add(sk2.character)
-					}
-				})
-				shuffle(innerList)
-				list = [...list, ...innerList]
-			})
-			return list
-		} else {
-			selectedKanji.value.forEach(sk => {
-				sk.forEach(sk2 => {
-					sk2.similar_kanji.forEach(sk3 => {
-						if(!seen.has(sk3.character)) {
-							list.push(sk3)
-							seen.add(sk3.character)
-						}
-					})
-					if(!seen.has(sk2.character)) {
-						list.push(sk2)
-						seen.add(sk2.character)
-					}
-				})
-			})
-			return shuffle(list)
-		}
-	})
 	const modelData = reactive({
-		meanings: shuffle(selectedKanjiList.value.map(k => k.meaning)),
-		characters: selectedKanjiList.value.map(k => {
-			return {
-				kanji: k.character,
-				correctMeaning: k.meaning,
-				attachedMeaning: "",
-				incorrect: null
-			}
-		})
-	})
-
-	watch(selectedKanjiList, (newValue, oldValue) => {
-		console.log('does newValue == oldValue?', newValue == oldValue, newValue, oldValue)
-		modelData.meanings = shuffle(newValue.map(k => k.meaning));
-		modelData.characters = shuffle(newValue.map(k => {
-			return {
-				kanji: k.character,
-				correctMeaning: k.meaning,
-				attachedMeaning: null,
-				incorrect: null
-			}
-		}))
+		meanings: [],
+		characters: []
 	})
 
 	function meaningSectionDropHandler(e) {
@@ -181,24 +119,20 @@
 		})
 
 		if(allAnswersCorrect) {
-			showPopup("ナイス！", () => { 
-				getNextKanjiSet()
-			})
+			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
 		}
 	}
 
-	function showPopup(popupText, functionToRun, long = false) {
-		let time = long ? 500 : 250
+	function popoverShow(popupText, popupSubtext) {
 		popoverText.value = popupText
+		popoverSubtext.value = popupSubtext
 		popover.value.style.pointerEvents = 'initial'
 		popover.value.style.opacity = 1
-		setTimeout(() => {
-			functionToRun()
-			setTimeout(() => {
-				popover.value.style.pointerEvents = 'none'
-				popover.value.style.opacity = 0
-			}, time * 2)
-		}, time)
+	}
+
+	function popoverHide() {
+		popover.value.style.pointerEvents = 'none'
+		popover.value.style.opacity = 0
 	}
 
 	function processDrop(e) {
@@ -233,6 +167,10 @@
 
 		let char = modelData.characters.find(c => c.kanji == goingToCharacter)
 		char.attachedMeaning = newMeaning
+
+		if(modelData.meanings.length <= 0 && autoCheck.value) {
+			checkAnswers()
+		}
 	}
 	function shuffle(array) {
 		let currentIndex = array.length;
@@ -249,34 +187,55 @@
 		}
 		return array
 	}
-	function resetKanjiList() {
-		kanjiList.value = buildLimitedKanjiSet(allKanji, levelLimit.value)
-	}
-	function getNextKanjiSet() {
-		if(kanjiList.value.length <= 0) {
-			resetKanjiList()
-		}
-		let newCharacters = getRandomKanjiSet(kanjiList.value, batchSize.value)
-		selectedKanji.value = newCharacters
-	}
 
 	function toggleSettings() {
 		showSettings.value = !showSettings.value
 	}
 
-	function reset() {
-		resetKanjiList()
-		getNextKanjiSet()
-	}
-
 	function updateSettings(newSettings) {
 		batchSize.value = newSettings.batchSize
 		group.value = newSettings.groupKanji
-		levelLimit.value = newSettings.levelLimit.upper
-		showPopup("設定を保存しました！", () => {
-			reset()
-			showSettings.value = false
-		}, true)
+		autoCheck.value = newSettings.autoCheck
+		levelLimitUpper.value = newSettings.levelLimit.upper
+		levelLimitLower.value = newSettings.levelLimit.lower
+		toggleSettings()
+		getNextKanjiBatch("設定を保存しました！", "Retrieving kanji list...")
+	}
+
+	function getNextKanjiBatch(popoverText, popoverSubtext) {
+		popoverShow(popoverText, popoverSubtext)
+		setTimeout(() => {
+			let request = apiRequest({
+				type: "KanjiBatchRequest",
+				data: {
+					user_id: "star",
+					group_count: batchSize.value,
+					max_level: levelLimitUpper.value,
+					min_level: levelLimitLower.value,
+					min_group_size: 2,
+				}
+			})
+			request.then(newKanji => {
+				updateKanji(newKanji)
+				setTimeout(popoverHide, 500)
+			})
+		}, 500)
+	}
+
+	function updateKanji(newKanji) {
+		let meanings = []
+		let characters = []
+		for(const kanji of Object.values(newKanji)) {
+			meanings.push(kanji.meaning)
+			characters.push({
+				kanji: kanji.character,
+				correctMeaning: kanji.meaning,
+				attachedMeaning: "",
+				incorrect: null
+			})
+		}
+		modelData.meanings = shuffleArray(meanings)
+		modelData.characters = shuffleArray(characters)
 	}
 </script>
 
@@ -461,5 +420,9 @@
 		user-select: none;
 		transition: opacity 0.25s;
 		z-index: 50;
+		text-align: center;
+	}
+	#nice-job-text div:last-child {
+		font-size: 30px;
 	}
 </style>
