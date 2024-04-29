@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang='ts'>
-	import { defineProps, defineEmits } from 'vue'
 	import KanjiCharacter from '@/components/KanjiCharacter.vue'
 	import KanjiMeaning   from '@/components/KanjiMeaning.vue'
 

@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-	import { defineProps } from 'vue'
 	defineProps({
 		hideTopLeft: 		 { type: Boolean, default: false },
 		hideTopRight: 	 { type: Boolean, default: false },
