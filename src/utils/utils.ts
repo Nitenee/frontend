@@ -1,4 +1,6 @@
-export async function apiRequest(requestData: any) {
+import { ApiRequest } from "./types"
+
+export async function apiRequest(requestData: ApiRequest) {
 	const fetchOptions: RequestInit = {
 		method: "POST",
 		headers: {

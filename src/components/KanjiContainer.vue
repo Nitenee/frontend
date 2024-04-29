@@ -14,19 +14,19 @@
 </template>
 
 <script setup lang='ts'>
-	import { defineProps, defineEmits, ref } from 'vue'
+	import { defineProps, defineEmits } from 'vue'
 	import KanjiCharacter from '@/components/KanjiCharacter.vue'
 	import KanjiMeaning   from '@/components/KanjiMeaning.vue'
-	import { Kanji } from '@/utils/utils'
 
-	const props = defineProps({
-		kanji: Kanji,
-		attachedMeaning: String,
-		incorrect: Boolean
-	})
+	const props = defineProps<{
+		kanji: string,
+		attachedMeaning: string,
+		incorrect: boolean | null
+	}>()
 	const emit  = defineEmits(['dropmeaning'])
 
-	function onDrop(e) {
+	function onDrop(e: DragEvent) {
+		if(!e.dataTransfer) throw new Error("Missing dataTransfer on drop event")
 		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
 		emit('dropmeaning', {
 			goingToCharacter: props.kanji,

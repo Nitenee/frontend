@@ -13,10 +13,10 @@
 
 <script setup lang='ts'>
 	import { defineProps, computed } from 'vue'
-	const props = defineProps({
-		character: String,
-		incorrect: Boolean
-	});	
+	const props = defineProps<{
+		character: string,
+		incorrect: boolean | null
+	}>()	
 	const incorrectStyle = computed(() => {
 		return props.incorrect ? "incorrect" : ""
 	})

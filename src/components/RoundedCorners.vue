@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 	import { defineProps } from 'vue'
-	const props = defineProps({
+	defineProps({
 		hideTopLeft: 		 { type: Boolean, default: false },
 		hideTopRight: 	 { type: Boolean, default: false },
 		hideBottomRight: { type: Boolean, default: false },

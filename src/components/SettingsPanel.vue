@@ -36,6 +36,10 @@
 							<div class="level-limit-option-title">Auto-Check</div>
 							<input type="checkbox" v-model="autoCheck" />
 						</div>
+						<div class="group-kanji">
+							<div class="level-limit-option-title">Auto-Continue</div>
+							<input type="checkbox" v-model="autoContinue" />
+						</div>
 					</div>
 				</div>
 				<div class="option-container">
@@ -81,6 +85,7 @@
 	const batchSize = ref(3)
 	const groupKanji = ref(true)
 	const autoCheck = ref(true)
+	const autoContinue = ref(true)
 	const useWaniKaniLevel = ref(false)
 	const upperLimitDisabled = computed(() => useWaniKaniLevel.value ? "disabled" : "")
 	const levelLimitUpper = ref(60)
@@ -88,7 +93,7 @@
 
 	const emit = defineEmits(['settingsUpdated']);
 
-	function checkLimits(inLimit) {
+	function checkLimits(inLimit: string) {
 		if(inLimit == "upper") {
 			if(levelLimitUpper.value > 60) levelLimitUpper.value = 60
 			else if(levelLimitUpper.value < 1) levelLimitUpper.value = 1

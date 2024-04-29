@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang='ts'>
-	import { defineProps, inject, computed, ref } from 'vue'
+	import { defineProps, computed } from 'vue'
 	const props = defineProps({
 		meaning: String,
 		attachedCharacter: String
@@ -34,8 +34,8 @@
 		}
 	})
 
-	function onDrag(e) {
-		e.dataTransfer.setData("text", JSON.stringify({ 
+	function onDrag(e: DragEvent) {
+		e.dataTransfer!.setData("text", JSON.stringify({ 
 				meaning: props.meaning,
 				attachedCharacter: props.attachedCharacter
 			})

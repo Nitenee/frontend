@@ -31,7 +31,7 @@
 				</div>
 			</div>
 			<div class="kanji-meaning-items-container">
-				<RoundedCorners hideBottomRight="true" hideTopRight="true" />
+				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
 				<div v-if="modelData.meanings.length > 0">
 					<KanjiMeaning 
 						v-for="meaning in modelData.meanings" 
@@ -43,7 +43,7 @@
 			</div>
 		</section>
 		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
-			<RoundedCorners hideBottomLeft="true" />
+			<RoundedCorners :hideBottomLeft="true" />
 			<div class="kanji-characters" v-if="modelData.characters.length > 0">
 				<KanjiContainer 
 					v-for="kanji in modelData.characters" 
@@ -70,8 +70,9 @@
 		TODO:
 		Add options to manually choose upper and lower level limits 
 	*/
-	import { ref, reactive, inject, computed, watch, onMounted } from 'vue'
-	import { apiRequest, shuffleArray } from '@/utils/utils'
+	import { ref, reactive, computed } from 'vue'
+	import { shuffleArray, apiRequest } from '@/utils/utils'
+	import { ServerKanji, KanjiBatchRequest, Settings, NDropEvent } from '@/utils/types'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
@@ -82,7 +83,7 @@
 	let batchSize = ref(3)
 	let group = ref(true)
 	let autoCheck = ref(true)
-	const popover = ref(null)
+	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
 	const showSettings = ref(true)
@@ -94,11 +95,12 @@
 		}
 	})
 	const modelData = reactive({
-		meanings: [],
-		characters: []
+		meanings: [] as string[],
+		characters: [] as {kanji: string; correctMeaning: string; attachedMeaning: string; incorrect: boolean | null;}[]
 	})
 
-	function meaningSectionDropHandler(e) {
+	function meaningSectionDropHandler(e: DragEvent) {
+		if(!e.dataTransfer) throw new Error("Trying to drop but no dataTransfer object exists on event")
 		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
 		processDrop({
 			goingToCharacter: "MEANINGZONE",
@@ -123,19 +125,22 @@
 		}
 	}
 
-	function popoverShow(popupText, popupSubtext) {
+	function popoverShow(popupText: string, popupSubtext: string) {
+		if(!popupText || !popupSubtext) throw new Error("You must enter popup text")
+		if(!popover.value) throw new Error ("popover ref is null")
 		popoverText.value = popupText
 		popoverSubtext.value = popupSubtext
 		popover.value.style.pointerEvents = 'initial'
-		popover.value.style.opacity = 1
+		popover.value.style.opacity = '1'
 	}
 
 	function popoverHide() {
+		if(!popover.value) throw new Error ("popover ref is null")
 		popover.value.style.pointerEvents = 'none'
-		popover.value.style.opacity = 0
+		popover.value.style.opacity = '0'
 	}
 
-	function processDrop(e) {
+	function processDrop(e: NDropEvent) {
 		const { goingToCharacter, comingFromCharacter, oldMeaning, newMeaning  } = e
 		if(goingToCharacter === "MEANINGZONE") {
 			//Ignore drop if picked up and dropped in meaning zone
@@ -166,33 +171,19 @@
 		modelData.meanings = modelData.meanings.filter(m => m != newMeaning)
 
 		let char = modelData.characters.find(c => c.kanji == goingToCharacter)
+		if(!char) throw new Error(`Unable to find ${goingToCharacter} in modelData.characters while trying to set attachedMeaning to newMeaning`)
 		char.attachedMeaning = newMeaning
 
 		if(modelData.meanings.length <= 0 && autoCheck.value) {
 			checkAnswers()
 		}
 	}
-	function shuffle(array) {
-		let currentIndex = array.length;
-
-		// While there remain elements to shuffle...
-		while (currentIndex != 0) {
-			// Pick a remaining element...
-			let randomIndex = Math.floor(Math.random() * currentIndex);
-			currentIndex--;
-
-			// And swap it with the current element.
-			[array[currentIndex], array[randomIndex]] = [
-				array[randomIndex], array[currentIndex]];
-		}
-		return array
-	}
 
 	function toggleSettings() {
 		showSettings.value = !showSettings.value
 	}
 
-	function updateSettings(newSettings) {
+	function updateSettings(newSettings: Settings) {
 		batchSize.value = newSettings.batchSize
 		group.value = newSettings.groupKanji
 		autoCheck.value = newSettings.autoCheck
@@ -202,10 +193,10 @@
 		getNextKanjiBatch("設定を保存しました！", "Retrieving kanji list...")
 	}
 
-	function getNextKanjiBatch(popoverText, popoverSubtext) {
+	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
 		popoverShow(popoverText, popoverSubtext)
 		setTimeout(() => {
-			let request = apiRequest({
+			let message: KanjiBatchRequest = {
 				type: "KanjiBatchRequest",
 				data: {
 					user_id: "star",
@@ -214,15 +205,16 @@
 					min_level: levelLimitLower.value,
 					min_group_size: 2,
 				}
-			})
-			request.then(newKanji => {
+			}
+			let request = apiRequest(message)
+			request.then((newKanji: ServerKanji) => {
 				updateKanji(newKanji)
 				setTimeout(popoverHide, 500)
 			})
 		}, 500)
 	}
 
-	function updateKanji(newKanji) {
+	function updateKanji(newKanji: ServerKanji) {
 		let meanings = []
 		let characters = []
 		for(const kanji of Object.values(newKanji)) {
