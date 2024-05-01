@@ -12,7 +12,7 @@
 					<div class="option-content">
 						<div class="batch-size">
 							<div>Size</div>
-							<input type="number" @blur="checkLimits('batch')" v-model="batchSize"/>
+							<input type="number" @blur="checkLimits('batch')" v-model="store.batchSize"/>
 						</div>
 					</div>
 				</div>
@@ -23,7 +23,7 @@
 					<div class="option-content">
 						<div class="group-kanji">
 							<div class="level-limit-option-title">Group Similar Kanji</div>
-							<input type="checkbox" v-model="groupKanji" />
+							<input type="checkbox" v-model="store.groupKanji" />
 						</div>
 					</div>
 				</div>
@@ -34,11 +34,11 @@
 					<div class="option-content">
 						<div class="group-kanji">
 							<div class="level-limit-option-title">Auto-Check</div>
-							<input type="checkbox" v-model="autoCheck" />
+							<input type="checkbox" v-model="store.autoCheck" />
 						</div>
 						<div class="group-kanji">
 							<div class="level-limit-option-title">Auto-Continue</div>
-							<input type="checkbox" v-model="autoContinue" />
+							<input type="checkbox" v-model="store.autoContinue" />
 						</div>
 					</div>
 				</div>
@@ -47,15 +47,15 @@
 					<div class="option-content">
 						<div class="level-limit">
 							<div class="level-limit-option-title" :class="upperLimitDisabled">Upper Limit</div>
-							<input type="number" @blur="checkLimits('upper')" v-model="levelLimitUpper" :disabled="useWanikaniLevel" />
+							<input type="number" @blur="checkLimits('upper')" v-model="store.levelLimitUpper" :disabled="store.useWanikaniLevel" />
 						</div>
 						<div class="level-limit">
 							<div class="level-limit-option-title">Lower Limit</div>
-							<input type="number" @blur="checkLimits('lower')" v-model="levelLimitLower" />
+							<input type="number" @blur="checkLimits('lower')" v-model="store.levelLimitLower" />
 						</div>
 						<div class="level-limit">
 							<div class="level-limit-option-title">Use WaniKani Level</div>
-							<input type="checkbox" v-model="useWanikaniLevel" />
+							<input type="checkbox" v-model="store.useWanikaniLevel" />
 						</div>
 					</div>
 				</div>
@@ -66,7 +66,7 @@
 					<div class="option-content">
 						<div class="wanikani">
 							<div>API Key</div>
-							<input type="password" v-model="wanikaniAPIKey" placeholder="API Key Goes Here" />
+							<input type="password" v-model="store.wanikaniAPIKey" placeholder="API Key Goes Here" />
 						</div>
 					</div>
 				</div>
@@ -81,48 +81,75 @@
 </template>
 
 <script setup lang='ts'>
-	import { ref, computed } from 'vue'
-	const batchSize = ref(3)
-	const groupKanji = ref(true)
-	const autoCheck = ref(true)
-	const autoContinue = ref(true)
-	const useWanikaniLevel = ref(false)
-	const wanikaniAPIKey = ref("")
-	const upperLimitDisabled = computed(() => useWanikaniLevel.value ? "disabled" : "")
-	const levelLimitUpper = ref(60)
-	const levelLimitLower = ref(1)
+	import { computed, onMounted } from 'vue'
+	import { useKanjiSettings } from '@/stores/kanjisettings'
 
 	const emit = defineEmits(['settingsUpdated']);
+	const store = useKanjiSettings()
+
+	const upperLimitDisabled = computed(() => store.useWanikaniLevel ? "disabled" : "")
+
 
 	function checkLimits(inLimit: string) {
 		if(inLimit == "upper") {
-			if(levelLimitUpper.value > 60) levelLimitUpper.value = 60
-			else if(levelLimitUpper.value < 1) levelLimitUpper.value = 1
+			if(store.levelLimitUpper > 60) store.levelLimitUpper = 60
+			else if(store.levelLimitUpper < 1) store.levelLimitUpper = 1
 		} else if(inLimit == "lower") {
-			if(levelLimitLower.value  > 60) levelLimitLower.value = 60 
-			else if(levelLimitLower.value  < 1) levelLimitLower.value = 1
+			if(store.levelLimitLower  > 60) store.levelLimitLower = 60 
+			else if(store.levelLimitLower  < 1) store.levelLimitLower = 1
 		} else if(inLimit == "batch") {
-			if(batchSize.value > 20) batchSize.value = 20
-			else if(batchSize.value < 1) batchSize.value = 1
+			if(store.batchSize > 20) store.batchSize = 20
+			else if(store.batchSize < 1) store.batchSize = 1
 		} else {
 			throw new Error(`Running checkLimits('${inLimit}'), but no case for ${inLimit}`)
 		}
 	}
 
 	function updateValues() {
-		emit('settingsUpdated', {
-			batchSize: batchSize.value,
-			groupKanji: groupKanji.value,
-			autoCheck: autoCheck.value,
-			autoContinue: autoContinue.value,
-			useWanikaniLevel: useWanikaniLevel.value,
-			wanikaniAPIKey: wanikaniAPIKey.value,
-			levelLimit: {
-				upper: levelLimitUpper.value, //TODO: Change this to check for WaniKani usage
-				lower: levelLimitLower.value
-			}
-		})
+		//Save settings to localstorage
+		localStorage.setItem('settingsExist', true.toString())
+		localStorage.setItem('batchSize', store.batchSize.toString())
+		localStorage.setItem('groupKanji', store.groupKanji.toString())
+		localStorage.setItem('autoCheck', store.autoCheck.toString())
+		localStorage.setItem('autoContinue', store.autoContinue.toString())
+		localStorage.setItem('useWanikaniLevel', store.useWanikaniLevel.toString())
+		localStorage.setItem('wanikaniAPIKey', store.wanikaniAPIKey)
+		localStorage.setItem('levelLimitUpper', store.levelLimitUpper.toString())
+		localStorage.setItem('levelLimitLower', store.levelLimitLower.toString())
+		emit('settingsUpdated')
 	}
+
+	onMounted(() => {
+		//Load from localStorage if settings exist
+		if(localStorage.getItem("settingsExist")){
+			let batchSize = localStorage.getItem('batchSize')
+			let groupKanji = localStorage.getItem('groupKanji')
+			let autoCheck = localStorage.getItem('autoCheck')
+			let autoContinue = localStorage.getItem('autoContinue')
+			let useWanikaniLevel = localStorage.getItem('useWanikaniLevel')
+			let wanikaniAPIKey = localStorage.getItem('wanikaniAPIKey')
+			let levelLimitUpper = localStorage.getItem('levelLimitUpper')
+			let levelLimitLower = localStorage.getItem('levelLimitLower')
+
+			if(!batchSize) throw new Error("Tried to recover batchSize from localStorage but it was undefined")
+			if(!groupKanji) throw new Error("Tried to recover groupKanji from localStorage but it was undefined")
+			if(!autoCheck) throw new Error("Tried to recover autoCheck from localStorage but it was undefined")
+			if(!autoContinue) throw new Error("Tried to recover autoContinue from localStorage but it was undefined")
+			if(!useWanikaniLevel) throw new Error("Tried to recover useWanikaniLevel from localStorage but it was undefined")
+			if(wanikaniAPIKey == null) throw new Error("Tried to recover wanikaniAPIKey from localStorage but it was null")
+			if(!levelLimitUpper) throw new Error("Tried to recover levelLimitUpper from localStorage but it was undefined")
+			if(!levelLimitLower) throw new Error("Tried to recover levelLimitLower from localStorage but it was undefined")
+
+			store.setBatchSize(Number(batchSize))
+			store.setGroupKanji((groupKanji === "true"))
+			store.setAutoCheck((autoCheck === "true"))
+			store.setAutoContinue((autoContinue === "true"))
+			store.setUseWanikaniLevel((useWanikaniLevel === "true"))
+			store.setWanikaniAPIKey(wanikaniAPIKey)
+			store.setLevelLimitUpper(Number(levelLimitUpper))
+			store.setLevelLimitLower(Number(levelLimitLower))
+		}
+	})
 </script>
 
 <style scoped>

@@ -61,25 +61,19 @@
 	/*
 		FIX:
 		Meanings not breaking mid word correctly
-		TODO:
-		Add option to input WaniKani API key to sync with WaniKani level 
 	*/
 	import { ref, reactive, computed } from 'vue'
+	import { useKanjiSettings } from '@/stores/kanjisettings'
 	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
-	import { ServerKanji, KanjiBatchRequest, Settings, NDropEvent } from '@/utils/types'
+	import { ServerKanji, KanjiBatchRequest, NDropEvent } from '@/utils/types'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
 	import SettingsPanel from '@/components/SettingsPanel.vue'
 	import CogWheelSVG from './CogWheelSVG.vue'
 
-	let levelLimitUpper = ref(60)
-	let levelLimitLower = ref(1)
-	let batchSize = ref(3)
-	let group = ref(true)
-	let autoCheck = ref(true)
-	let autoContinue = ref(true)
-	let useWanikaniLevel = ref(false)
+	const store = useKanjiSettings()
+
 	let wanikaniLevel = ref<number | null>(null)
 	let wanikaniUsername = ref("")
 	let readyToGoToNextKanjiBatch = ref(false)
@@ -128,7 +122,7 @@
 			character.incorrect = !correct
 		})
 
-		if(allAnswersCorrect && autoContinue.value) {
+		if(allAnswersCorrect && store.autoContinue) {
 			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
 		} else if(allAnswersCorrect) {
 			popoverShow("グッドジョブ！", "Looking good!")
@@ -190,7 +184,7 @@
 		if(!char) throw new Error(`Unable to find ${goingToCharacter} in modelData.characters while trying to set attachedMeaning to newMeaning`)
 		char.attachedMeaning = newMeaning
 
-		if(modelData.meanings.length <= 0 && autoCheck.value) {
+		if(modelData.meanings.length <= 0 && store.autoCheck) {
 			checkAnswers()
 		}
 	}
@@ -199,47 +193,37 @@
 		showSettings.value = !showSettings.value
 	}
 
-	function updateSettings(newSettings: Settings) {
-		if(!wanikaniLevel.value && newSettings.wanikaniAPIKey) {
+	function updateSettings() {
+		if(!wanikaniLevel.value && store.wanikaniAPIKey) {
 			popoverShow("ちょい待ちこ", "Fetching Wanikani info...")
-			wanikaniRequest(newSettings.wanikaniAPIKey).then(userData => {
+			wanikaniRequest(store.wanikaniAPIKey).then(userData => {
 				wanikaniLevel.value = userData.data.level
 				wanikaniUsername.value = userData.data.username
-				setSettings(newSettings)
+				toggleSettings()
+				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
 			})
 
 		} else {
-			setSettings(newSettings)
+			toggleSettings()
+			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
 		}
-	}
-
-	function setSettings(newSettings: Settings) {
-		batchSize.value = newSettings.batchSize
-		group.value = newSettings.groupKanji
-		autoCheck.value = newSettings.autoCheck
-		autoContinue.value = newSettings.autoContinue
-		useWanikaniLevel.value = newSettings.useWanikaniLevel
-		levelLimitUpper.value = newSettings.levelLimit.upper
-		levelLimitLower.value = newSettings.levelLimit.lower
-		toggleSettings()
-		getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
 	}
 
 	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
 		popoverShow(popoverText, popoverSubtext)
 		setTimeout(() => {
 			readyToGoToNextKanjiBatch.value = false
-			let maxLevelRequest = levelLimitUpper.value
-			if(useWanikaniLevel.value && wanikaniLevel.value && wanikaniUsername) {
+			let maxLevelRequest = store.levelLimitUpper
+			if(store.useWanikaniLevel && wanikaniLevel.value && wanikaniUsername) {
 				maxLevelRequest = wanikaniLevel.value
 			}
 			let message: KanjiBatchRequest = {
 				type: "KanjiBatchRequest",
 				data: {
 					user_id: wanikaniUsername.value,
-					group_count: batchSize.value,
+					group_count: store.batchSize,
 					max_level: maxLevelRequest,
-					min_level: levelLimitLower.value,
+					min_level: store.levelLimitLower,
 					min_group_size: 2,
 				}
 			}

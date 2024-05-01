@@ -22,19 +22,6 @@ export interface ServerKanji {
 	}
 }
 
-export interface Settings {
-	batchSize: number;
-	groupKanji: boolean;
-	autoCheck: boolean;
-	autoContinue: boolean;
-	useWanikaniLevel: boolean;
-	wanikaniAPIKey: string;
-	levelLimit: {
-			upper: number;
-			lower: number;
-		}
-}
-
 export interface NDropEvent {
 	goingToCharacter: string;
 	comingFromCharacter: string;
