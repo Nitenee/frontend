@@ -23,8 +23,8 @@
 		<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
 			<div class="button-container">
 				<div>
-					<button class="submit-button" @click.prevent="checkAnswers">
-						Check
+					<button class="submit-button" @click.prevent="onSubmit">
+						{{ readyToGoToNextKanjiBatch ? "Continue" : "Check" }}
 					</button>
 				</div>
 			</div>
@@ -63,8 +63,6 @@
 		Meanings not breaking mid word correctly
 		TODO:
 		Add option to input WaniKani API key to sync with WaniKani level 
-		TODO:
-		Add option to check correct answers before continuing to next kanji batch
 	*/
 	import { ref, reactive, computed } from 'vue'
 	import { shuffleArray, apiRequest } from '@/utils/utils'
@@ -80,6 +78,8 @@
 	let batchSize = ref(3)
 	let group = ref(true)
 	let autoCheck = ref(true)
+	let autoContinue = ref(true)
+	let readyToGoToNextKanjiBatch = ref(false)
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
@@ -107,6 +107,14 @@
 		})
 	}
 
+	function onSubmit() {
+		if (readyToGoToNextKanjiBatch.value) {
+			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
+		} else {
+			checkAnswers()
+		}
+	}
+
 	function checkAnswers() {
 		let allAnswersCorrect = true
 		modelData.characters.forEach(character => {
@@ -117,8 +125,16 @@
 			character.incorrect = !correct
 		})
 
-		if(allAnswersCorrect) {
+		if(allAnswersCorrect && autoContinue.value) {
 			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
+		} else if(allAnswersCorrect) {
+			popoverShow("グッドジョブ！", "Looking good!")
+			setTimeout(() => {
+				readyToGoToNextKanjiBatch.value = true
+				setTimeout(() => {
+					popoverHide()
+				}, 500)
+			}, 500)
 		}
 	}
 
@@ -184,6 +200,7 @@
 		batchSize.value = newSettings.batchSize
 		group.value = newSettings.groupKanji
 		autoCheck.value = newSettings.autoCheck
+		autoContinue.value = newSettings.autoContinue
 		levelLimitUpper.value = newSettings.levelLimit.upper
 		levelLimitLower.value = newSettings.levelLimit.lower
 		toggleSettings()
@@ -193,6 +210,7 @@
 	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
 		popoverShow(popoverText, popoverSubtext)
 		setTimeout(() => {
+			readyToGoToNextKanjiBatch.value = false
 			let message: KanjiBatchRequest = {
 				type: "KanjiBatchRequest",
 				data: {

@@ -113,6 +113,7 @@
 			batchSize: batchSize.value,
 			groupKanji: groupKanji.value,
 			autoCheck: autoCheck.value,
+			autoContinue: autoContinue.value,
 			levelLimit: {
 				upper: levelLimitUpper.value, //TODO: Change this to check for WaniKani usage
 				lower: levelLimitLower.value

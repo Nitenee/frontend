@@ -26,6 +26,7 @@ export interface Settings {
 	batchSize: number;
 	groupKanji: boolean;
 	autoCheck: boolean;
+	autoContinue: boolean;
 	levelLimit: {
 			upper: number;
 			lower: number;

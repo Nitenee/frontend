@@ -56,7 +56,7 @@
 		border: 5px solid #ca9ee6;
 		background-color: #626880;
 		box-shadow: 4px 4px 8px #0003;
-}
+	}
 	.meaning-drop-zone {
 		margin-top: -32px;
 		height: 100px;
