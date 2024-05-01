@@ -25,3 +25,14 @@ export function shuffleArray(array: Array<any>) {
 
 	return array
 }
+
+export async function wanikaniRequest(wanikaniAPIKey: string) {
+	const request = await fetch("https://api.wanikani.com/v2/user", {
+		headers: {
+			"Wanikani-Revision": "20170710",
+			"Authorization": `Bearer ${wanikaniAPIKey}`
+		}
+	})
+	const json = await request.json()
+	return json
+}

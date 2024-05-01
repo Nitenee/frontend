@@ -27,6 +27,8 @@ export interface Settings {
 	groupKanji: boolean;
 	autoCheck: boolean;
 	autoContinue: boolean;
+	useWanikaniLevel: boolean;
+	wanikaniAPIKey: string;
 	levelLimit: {
 			upper: number;
 			lower: number;

@@ -65,7 +65,7 @@
 		Add option to input WaniKani API key to sync with WaniKani level 
 	*/
 	import { ref, reactive, computed } from 'vue'
-	import { shuffleArray, apiRequest } from '@/utils/utils'
+	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
 	import { ServerKanji, KanjiBatchRequest, Settings, NDropEvent } from '@/utils/types'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
@@ -79,6 +79,9 @@
 	let group = ref(true)
 	let autoCheck = ref(true)
 	let autoContinue = ref(true)
+	let useWanikaniLevel = ref(false)
+	let wanikaniLevel = ref<number | null>(null)
+	let wanikaniUsername = ref("")
 	let readyToGoToNextKanjiBatch = ref(false)
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
@@ -197,26 +200,45 @@
 	}
 
 	function updateSettings(newSettings: Settings) {
+		if(!wanikaniLevel.value && newSettings.wanikaniAPIKey) {
+			popoverShow("ちょい待ちこ", "Fetching Wanikani info...")
+			wanikaniRequest(newSettings.wanikaniAPIKey).then(userData => {
+				wanikaniLevel.value = userData.data.level
+				wanikaniUsername.value = userData.data.username
+				setSettings(newSettings)
+			})
+
+		} else {
+			setSettings(newSettings)
+		}
+	}
+
+	function setSettings(newSettings: Settings) {
 		batchSize.value = newSettings.batchSize
 		group.value = newSettings.groupKanji
 		autoCheck.value = newSettings.autoCheck
 		autoContinue.value = newSettings.autoContinue
+		useWanikaniLevel.value = newSettings.useWanikaniLevel
 		levelLimitUpper.value = newSettings.levelLimit.upper
 		levelLimitLower.value = newSettings.levelLimit.lower
 		toggleSettings()
-		getNextKanjiBatch("設定を保存しました！", "Retrieving kanji list...")
+		getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
 	}
 
 	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
 		popoverShow(popoverText, popoverSubtext)
 		setTimeout(() => {
 			readyToGoToNextKanjiBatch.value = false
+			let maxLevelRequest = levelLimitUpper.value
+			if(useWanikaniLevel.value && wanikaniLevel.value && wanikaniUsername) {
+				maxLevelRequest = wanikaniLevel.value
+			}
 			let message: KanjiBatchRequest = {
 				type: "KanjiBatchRequest",
 				data: {
-					user_id: "star",
+					user_id: wanikaniUsername.value,
 					group_count: batchSize.value,
-					max_level: levelLimitUpper.value,
+					max_level: maxLevelRequest,
 					min_level: levelLimitLower.value,
 					min_group_size: 2,
 				}

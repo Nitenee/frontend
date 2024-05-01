@@ -47,7 +47,7 @@
 					<div class="option-content">
 						<div class="level-limit">
 							<div class="level-limit-option-title" :class="upperLimitDisabled">Upper Limit</div>
-							<input type="number" @blur="checkLimits('upper')" v-model="levelLimitUpper" :disabled="useWaniKaniLevel" />
+							<input type="number" @blur="checkLimits('upper')" v-model="levelLimitUpper" :disabled="useWanikaniLevel" />
 						</div>
 						<div class="level-limit">
 							<div class="level-limit-option-title">Lower Limit</div>
@@ -55,7 +55,7 @@
 						</div>
 						<div class="level-limit">
 							<div class="level-limit-option-title">Use WaniKani Level</div>
-							<input type="checkbox" v-model="useWaniKaniLevel" />
+							<input type="checkbox" v-model="useWanikaniLevel" />
 						</div>
 					</div>
 				</div>
@@ -66,7 +66,7 @@
 					<div class="option-content">
 						<div class="wanikani">
 							<div>API Key</div>
-							<input type="password" placeholder="API Key Goes Here" />
+							<input type="password" v-model="wanikaniAPIKey" placeholder="API Key Goes Here" />
 						</div>
 					</div>
 				</div>
@@ -86,8 +86,9 @@
 	const groupKanji = ref(true)
 	const autoCheck = ref(true)
 	const autoContinue = ref(true)
-	const useWaniKaniLevel = ref(false)
-	const upperLimitDisabled = computed(() => useWaniKaniLevel.value ? "disabled" : "")
+	const useWanikaniLevel = ref(false)
+	const wanikaniAPIKey = ref("")
+	const upperLimitDisabled = computed(() => useWanikaniLevel.value ? "disabled" : "")
 	const levelLimitUpper = ref(60)
 	const levelLimitLower = ref(1)
 
@@ -114,6 +115,8 @@
 			groupKanji: groupKanji.value,
 			autoCheck: autoCheck.value,
 			autoContinue: autoContinue.value,
+			useWanikaniLevel: useWanikaniLevel.value,
+			wanikaniAPIKey: wanikaniAPIKey.value,
 			levelLimit: {
 				upper: levelLimitUpper.value, //TODO: Change this to check for WaniKani usage
 				lower: levelLimitLower.value
