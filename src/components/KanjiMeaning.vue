@@ -1,20 +1,23 @@
 <template>
-	<div :id="`meaning-node-${meaning}`" class="container" :class="attached">
-		<div draggable=true @dragstart="onDrag">
-			<div class="puzzle-hole-container">
-				<div :class="puzzleHoleClasses">
-					<div class="puzzle-hole-shadow-hider"></div>
+	<DraggableWrapper>
+		<div :id="`meaning-node-${meaning}`" class="container" :class="attached">
+			<div>
+				<div class="puzzle-hole-container">
+					<div :class="puzzleHoleClasses">
+						<div class="puzzle-hole-shadow-hider"></div>
+					</div>
+				</div>
+				<div class="meaning" lang="en">
+					<span>{{ meaning }}</span>
 				</div>
 			</div>
-			<div class="meaning" lang="en">
-				<span>{{ meaning }}</span>
-			</div>
 		</div>
-	</div>
+	</DraggableWrapper>
 </template>
 
 <script setup lang='ts'>
 	import { computed } from 'vue'
+	import DraggableWrapper from './DraggableWrapper.vue'
 	const props = defineProps({
 		meaning: String,
 		attachedCharacter: String
