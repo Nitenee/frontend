@@ -20,7 +20,7 @@
 				</button>
 			</div>
 		</nav>
-		<div id="puzzle-stage">
+		<div ref="puzzleStage" id="puzzle-stage">
 			<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
 				<div class="button-container">
 					<div>
@@ -31,7 +31,7 @@
 				</div>
 				<div class="kanji-meaning-items-container">
 					<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
-					<div v-if="modelData.meanings.length > 0">
+					<div>
 						<KanjiMeaning 
 							v-for="meaning in modelData.meanings" 
 							:key="meaning" 
@@ -75,6 +75,7 @@
 	import CogWheelSVG from './CogWheelSVG.vue'
 
 	const store = useKanjiSettings()
+	const puzzleStage = ref<HTMLElement | null>(null)
 
 	let wanikaniLevel = ref<number | null>(null)
 	let wanikaniUsername = ref("")
@@ -192,6 +193,13 @@
 	}
 
 	function toggleSettings() {
+		//Programmatically add and remove transition so there's no strange animations on window resize
+		if(!puzzleStage.value) throw new Error("Tried to access puzzleStage ref but it's null")
+		puzzleStage.value.style.transition = 'width 1s cubic-bezier(.75,0,.25,1)'
+		setTimeout(() => {
+			if(!puzzleStage.value) throw new Error("Tried to access puzzleStage ref but it's null")
+			puzzleStage.value.style.transition = ''
+		}, 1000)
 		showSettings.value = !showSettings.value
 	}
 
@@ -295,8 +303,7 @@
 	}
 	#puzzle-stage {
 		display: flex;
-		width: calc(100vw + 300px);
-		transition: width 1s cubic-bezier(.75,0,.25,1);
+		width: calc(100vw + 295px);
 	}
 	#stage.showSettings #puzzle-stage {
 		width: calc(100vw - 20px);
@@ -369,7 +376,7 @@
 	}
 	.kanji-meanings {
 		height: calc(100dvh - 64px);
-		width: 200px;
+		min-width: 200px;
 		background-color: #51576d;
 	}
 	.kanji-meaning-items-container {
