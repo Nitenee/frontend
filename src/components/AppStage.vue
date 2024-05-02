@@ -20,40 +20,42 @@
 				</button>
 			</div>
 		</nav>
-		<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
-			<div class="button-container">
-				<div>
-					<button class="submit-button" @click.prevent="onSubmit">
-						{{ readyToGoToNextKanjiBatch ? "Continue" : "Check" }}
-					</button>
+		<div id="puzzle-stage">
+			<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
+				<div class="button-container">
+					<div>
+						<button class="submit-button" @click.prevent="onSubmit">
+							{{ readyToGoToNextKanjiBatch ? "Continue" : "Check" }}
+						</button>
+					</div>
 				</div>
-			</div>
-			<div class="kanji-meaning-items-container">
-				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
-				<div v-if="modelData.meanings.length > 0">
-					<KanjiMeaning 
-						v-for="meaning in modelData.meanings" 
-						:key="meaning" 
-						:meaning="meaning" 
-						:attachedCharacter="''"
+				<div class="kanji-meaning-items-container">
+					<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
+					<div v-if="modelData.meanings.length > 0">
+						<KanjiMeaning 
+							v-for="meaning in modelData.meanings" 
+							:key="meaning" 
+							:meaning="meaning" 
+							:attachedCharacter="''"
+						/>
+					</div>
+				</div>
+			</section>
+			<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
+				<RoundedCorners :hideBottomLeft="true" />
+				<div class="kanji-characters" v-if="modelData.characters.length > 0">
+					<KanjiContainer 
+						v-for="kanji in modelData.characters" 
+						:key="kanji.kanji" 
+						:kanji="kanji.kanji" 
+						:attachedMeaning="kanji.attachedMeaning"
+						:incorrect="kanji.incorrect"
+						@dropmeaning="processDrop"
 					/>
 				</div>
-			</div>
-		</section>
-		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
-			<RoundedCorners :hideBottomLeft="true" />
-			<div class="kanji-characters" v-if="modelData.characters.length > 0">
-				<KanjiContainer 
-					v-for="kanji in modelData.characters" 
-					:key="kanji.kanji" 
-					:kanji="kanji.kanji" 
-					:attachedMeaning="kanji.attachedMeaning"
-					:incorrect="kanji.incorrect"
-					@dropmeaning="processDrop"
-				/>
-			</div>
-		</section>
-		<SettingsPanel @settingsUpdated="updateSettings"/>
+			</section>
+			<SettingsPanel @settingsUpdated="updateSettings"/>
+		</div>
 	</div>
 </template>
 
@@ -254,21 +256,16 @@
 
 <style scoped>
 	#stage {
-		display: grid;
-		grid-template-rows: 60px 1fr;
-		grid-template-columns: 200px 1fr 0;
+		display: flex;
+		flex-direction: column;
 		height: calc(100dvh - 4px);
 		overflow: hidden;
-		transition: grid-template-columns 1s cubic-bezier(.75,0,.25,1);
-	}
-	#stage.showSettings {
-		grid-template-columns: 200px 1fr 300px;
 	}
 	nav {
-		grid-column: span 3;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		margin-bottom: 5px;
 	}
 	.app-name {
 		margin-left: 10px;
@@ -295,6 +292,14 @@
 	}
 	.app-name div:nth-child(7) {
 		translate: 0 0px;
+	}
+	#puzzle-stage {
+		display: flex;
+		width: calc(100vw + 300px);
+		transition: width 1s cubic-bezier(.75,0,.25,1);
+	}
+	#stage.showSettings #puzzle-stage {
+		width: calc(100vw - 20px);
 	}
 	.settings-button-container {
 		margin-right: 10px;
@@ -343,7 +348,9 @@
 	}
 	.kanji-characters-container {
 		position: relative;
-		height: calc(100% - 64px);
+		height: 100%;
+		width: calc(100vw - 500px);
+		flex-grow: 1;
 		box-shadow: inset 0px 0px 2px 2px #0007;
 		background-color: #303446;
 	}
@@ -362,6 +369,7 @@
 	}
 	.kanji-meanings {
 		height: calc(100dvh - 64px);
+		width: 200px;
 		background-color: #51576d;
 	}
 	.kanji-meaning-items-container {
