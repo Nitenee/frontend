@@ -36,14 +36,6 @@
 			return ""
 		}
 	})
-
-	function onDrag(e: DragEvent) {
-		e.dataTransfer!.setData("text", JSON.stringify({ 
-				meaning: props.meaning,
-				attachedCharacter: props.attachedCharacter
-			})
-		) // Second property is character the meaning is currently attached to
-	}
 </script>
 
 <style scoped>

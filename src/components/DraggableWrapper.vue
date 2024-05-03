@@ -1,18 +1,24 @@
 <template>
-	<div ref="draggableContainer" @pointerdown="onPointerDown" @pointerup="onPointerUp">
+	<div 
+		ref="draggableContainer" 
+		@mouseleave ="onMouseLeave" 
+		@pointerdown="onPointerDown" 
+		@pointerup="onPointerUp"
+	>
 		<slot></slot>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { onMounted, ref } from "vue"	
+	import { ref } from "vue"	
 
 	const draggableContainer = ref<HTMLElement | null>(null)
-	const originalParent = ref<HTMLElement | null>(null)
+	let pointerId: number | null = null
 
 	function onPointerDown(e: PointerEvent) {
 		if(!draggableContainer.value) throw new Error("Pointer down on element but ref is null")
 
+		pointerId = e.pointerId
 		draggableContainer.value.setPointerCapture(e.pointerId)
 
 		draggableContainer.value.addEventListener("pointermove", onPointerMove)
@@ -23,7 +29,8 @@
 	
 		if(draggableContainer.value.style.position !== "fixed") {
 			draggableContainer.value.style.position = "fixed"
-			document.body.append(draggableContainer.value)
+			draggableContainer.value.style.zIndex = "5000"
+			document.body.style.cursor = "grabbing"
 		}
 		draggableContainer.value.style.left = e.x - 50 + "px"
 		draggableContainer.value.style.top = e.y - 20 + "px"
@@ -35,16 +42,16 @@
 		draggableContainer.value.releasePointerCapture(e.pointerId)
 		draggableContainer.value.removeEventListener("pointermove", onPointerMove)
 		draggableContainer.value.style.position = "initial"
-		originalParent.value?.append(draggableContainer.value)
+		document.body.style.cursor = "inherit"
 	}
 
-	onMounted(() => {
-		if(!draggableContainer.value) throw new Error("DraggableContainer mounted but ref is null")
-
-		originalParent.value = draggableContainer.value.parentElement
-	})
-
+	function onMouseLeave(e: MouseEvent) {
+		if(pointerId) {
+			if(!draggableContainer.value) throw new Error("Blur on element but ref is null")
+			draggableContainer.value.releasePointerCapture(pointerId)
+			draggableContainer.value.removeEventListener("pointermove", onPointerMove)
+			draggableContainer.value.style.position = "initial"
+			document.body.style.cursor = "inherit"
+		}
+	}
 </script>
-
-<style scoped>
-</style>
