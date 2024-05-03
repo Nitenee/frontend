@@ -1,5 +1,5 @@
 <template>
-	<div id="stage" :class="toggleSettingsStyle">
+	<div id="stage" :class="toggleSettingsStyle" @pointerup="unsetDragging">
 		<PopOver 
 			:popoverText="popoverText"
 			:popoverSubtext="popoverSubtext"
@@ -7,14 +7,8 @@
 		/>
 		<NavBar @togglesettings="toggleSettings" />
 		<div ref="puzzleStage" id="puzzle-stage">
-			<KanjiMeaningSection
-				:meanings="modelData.meanings"
-				:ready-to-go-to-next-kanji-batch="readyToGoToNextKanjiBatch"
-				@on-submit="onSubmit"
-			/>
-			<KanjiCharacterSection
-				:characters="modelData.characters"
-			/>
+			<KanjiMeaningSection @on-submit="onSubmit" />
+			<KanjiCharacterSection />
 			<SettingsPanel @settingsUpdated="updateSettings"/>
 		</div>
 	</div>
@@ -25,10 +19,12 @@
 		FIX:
 		Meanings not breaking mid word correctly
 	*/
-	import { ref, reactive, computed } from 'vue'
+	import { ref, computed } from 'vue'
 	import { useKanjiSettings } from '@/stores/kanjisettings'
+	import { useDragAndDrop } from '@/stores/draganddrop'
+	import { useKanjiState } from '@/stores/kanjistate'
 	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
-	import { ServerKanji, KanjiBatchRequest, NDropEvent } from '@/utils/types'
+	import { ServerKanji, KanjiBatchRequest } from '@/utils/types'
 
 	import NavBar from '@/components/NavBar.vue'
 	import PopOver from '@/components/PopOver.vue'
@@ -36,12 +32,15 @@
 	import KanjiCharacterSection from '@/components/KanjiCharacterSection.vue'
 	import SettingsPanel from '@/components/SettingsPanel.vue'
 
-	const store = useKanjiSettings()
+	const settings = useKanjiSettings()
+	const dragAndDrop = useDragAndDrop()
+	const state = useKanjiState()
 	const puzzleStage = ref<HTMLElement | null>(null)
+
+	state.setCheckAnswers(autoCheckAnswers)
 
 	let wanikaniLevel = ref<number | null>(null)
 	let wanikaniUsername = ref("")
-	let readyToGoToNextKanjiBatch = ref(false)
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
@@ -53,33 +52,28 @@
 			return ""
 		}
 	})
-	const modelData = reactive({
-		meanings: [] as string[],
-		characters: [] as {kanji: string; correctMeaning: string; attachedMeaning: string; incorrect: boolean | null;}[]
-	})
 
-	function meaningSectionDropHandler(e: DragEvent) {
-		if(!e.dataTransfer) throw new Error("Trying to drop but no dataTransfer object exists on event")
-		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
-		processDrop({
-			goingToCharacter: "MEANINGZONE",
-			comingFromCharacter: attachedCharacter,
-			oldMeaning: "MEANINGZONE",
-			newMeaning: meaning
-		})
+	function unsetDragging() {
+		dragAndDrop.clearDragging()
 	}
 
 	function onSubmit() {
-		if (readyToGoToNextKanjiBatch.value) {
+		if (state.readyToGoToNextKanjiBatch) {
 			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
 		} else {
 			checkAnswers()
 		}
 	}
 
+	function autoCheckAnswers() {
+		if(state.modelData.meanings.length <= 0 && settings.autoCheck) {
+			checkAnswers()
+		}
+	}
+
 	function checkAnswers() {
 		let allAnswersCorrect = true
-		modelData.characters.forEach(character => {
+		state.modelData.characters.forEach(character => {
 			let correct = character.correctMeaning == character.attachedMeaning
 			if(!correct) {
 				allAnswersCorrect = false
@@ -87,12 +81,12 @@
 			character.incorrect = !correct
 		})
 
-		if(allAnswersCorrect && store.autoContinue) {
+		if(allAnswersCorrect && settings.autoContinue) {
 			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
 		} else if(allAnswersCorrect) {
 			popoverShow("グッドジョブ！", "Looking good!")
 			setTimeout(() => {
-				readyToGoToNextKanjiBatch.value = true
+				state.setReadyToGoToNextKanjiBatch(true)
 				setTimeout(() => {
 					popoverHide()
 				}, 500)
@@ -102,57 +96,28 @@
 
 	function popoverShow(popupText: string, popupSubtext: string) {
 		if(!popupText || !popupSubtext) throw new Error("You must enter popup text")
-		if(!popover.value) throw new Error ("popover ref is null")
+		if(!popover.value || !popover.value.popover) throw new Error ("popover ref is null")
 		popoverText.value = popupText
 		popoverSubtext.value = popupSubtext
+		// TypeScript weirding out about this syntax
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.value.popover.style.pointerEvents = 'initial'
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.value.popover.style.opacity = '1'
 	}
 
 	function popoverHide() {
-		if(!popover.value) throw new Error ("popover ref is null")
+		if(!popover.value || !popover.value.popover) throw new Error ("popover ref is null")
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.value.popover.style.pointerEvents = 'none'
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.value.popover.style.opacity = '0'
 	}
 
-	function processDrop(e: NDropEvent) {
-		const { goingToCharacter, comingFromCharacter, oldMeaning, newMeaning  } = e
-		// if(goingToCharacter === "MEANINGZONE") {
-		// 	//Ignore drop if picked up and dropped in meaning zone
-		// 	if(modelData.meanings.find(m => m == newMeaning)) return
-		//
-		// 	let char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-		// 	if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
-		//
-		// 	char.attachedMeaning = ""
-		// 	modelData.meanings.push(newMeaning)
-		// 	return
-		// }
-		//
-		// if(comingFromCharacter && oldMeaning) {
-		// 	let char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-		// 	if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
-		//
-		// 	char.attachedMeaning = oldMeaning
-		// } else if(!comingFromCharacter && oldMeaning) {
-		// 	modelData.meanings.push(oldMeaning)
-		// } else if(comingFromCharacter && !oldMeaning) {
-		// 	let char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-		// 	if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
-		//
-		// 	char.attachedMeaning = ""
-		// }
-		//
-		// modelData.meanings = modelData.meanings.filter(m => m != newMeaning)
-		//
-		// let char = modelData.characters.find(c => c.kanji == goingToCharacter)
-		// if(!char) throw new Error(`Unable to find ${goingToCharacter} in modelData.characters while trying to set attachedMeaning to newMeaning`)
-		// char.attachedMeaning = newMeaning
-
-		if(modelData.meanings.length <= 0 && store.autoCheck) {
-			checkAnswers()
-		}
-	}
 
 	function toggleSettings() {
 		//Programmatically add and remove transition so there's no strange animations on window resize
@@ -166,9 +131,9 @@
 	}
 
 	function updateSettings() {
-		if(!wanikaniLevel.value && store.wanikaniAPIKey) {
+		if(!wanikaniLevel.value && settings.wanikaniAPIKey) {
 			popoverShow("ちょい待ちこ", "Fetching Wanikani info...")
-			wanikaniRequest(store.wanikaniAPIKey).then(userData => {
+			wanikaniRequest(settings.wanikaniAPIKey).then(userData => {
 				wanikaniLevel.value = userData.data.level
 				wanikaniUsername.value = userData.data.username
 				toggleSettings()
@@ -184,18 +149,18 @@
 	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
 		popoverShow(popoverText, popoverSubtext)
 		setTimeout(() => {
-			readyToGoToNextKanjiBatch.value = false
-			let maxLevelRequest = store.levelLimitUpper
-			if(store.useWanikaniLevel && wanikaniLevel.value && wanikaniUsername) {
+			state.setReadyToGoToNextKanjiBatch(false)
+			let maxLevelRequest = settings.levelLimitUpper
+			if(settings.useWanikaniLevel && wanikaniLevel.value && wanikaniUsername) {
 				maxLevelRequest = wanikaniLevel.value
 			}
 			let message: KanjiBatchRequest = {
 				type: "KanjiBatchRequest",
 				data: {
 					user_id: wanikaniUsername.value,
-					group_count: store.batchSize,
+					group_count: settings.batchSize,
 					max_level: maxLevelRequest,
-					min_level: store.levelLimitLower,
+					min_level: settings.levelLimitLower,
 					min_group_size: 2,
 				}
 			}
@@ -219,8 +184,7 @@
 				incorrect: null
 			})
 		}
-		modelData.meanings = shuffleArray(meanings)
-		modelData.characters = shuffleArray(characters)
+		state.setModelData(shuffleArray(meanings), shuffleArray(characters))
 	}
 </script>
 

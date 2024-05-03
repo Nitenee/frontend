@@ -2,8 +2,8 @@
 	<section class="kanji-meanings">
 		<div class="button-container">
 			<div>
-				<button class="submit-button" @click.prevent="emit('onSubmit')">
-					{{ readyToGoToNextKanjiBatch ? "Continue" : "Check" }}
+				<button class="submit-button" :class="continueStyle" @click.prevent="emit('onSubmit')">
+					{{ submitButtonText }}
 				</button>
 			</div>
 		</div>
@@ -11,7 +11,7 @@
 			<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
 			<div>
 				<KanjiMeaning 
-					v-for="meaning in meanings" 
+					v-for="meaning in state.modelData.meanings" 
 					:key="meaning" 
 					:meaning="meaning" 
 					:attachedCharacter="''"
@@ -22,16 +22,20 @@
 </template>
 
 <script setup lang='ts'>
+	import { computed } from 'vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
+	import { useKanjiState } from '@/stores/kanjistate'
 
-	defineProps<{
-		meanings: string[],
-		readyToGoToNextKanjiBatch: boolean
-	}>();
+	const state = useKanjiState()
+	const submitButtonText = computed(() => {
+		return state.readyToGoToNextKanjiBatch ? "Continue" : "Check" 
+	})
+	const continueStyle = computed(() => {
+		return state.readyToGoToNextKanjiBatch ? "continue" : ""
+	})
 
 	const emit = defineEmits(['onSubmit'])
-	
 </script>
 
 <style scoped>
@@ -85,12 +89,18 @@
 		font-size: 20px;
 		background-color: #babbf1;
 		box-shadow: 2px 2px 2px #0004;
-		transition: translate 0.3s, box-shadow 0.3s;
+		transition: translate 0.3s, box-shadow 0.3s, background-color 0.3s;
 	}
 	.submit-button:hover {
 		cursor: pointer;
 		background-color: #cacbff;
 		box-shadow: 4px 4px 8px #0004;
 		translate: -2px -2px;
+	}
+	.continue {
+		background-color: #a6d189;
+	}
+	.submit-button.continue:hover {
+		background-color: #c6f1a9;
 	}
 </style>

@@ -1,9 +1,9 @@
 <template>
 	<section class="kanji-characters-container">
 		<RoundedCorners :hideBottomLeft="true" />
-		<div class="kanji-characters" v-if="characters.length > 0">
+		<div class="kanji-characters" v-if="modelData.characters.length > 0">
 			<KanjiContainer 
-				v-for="kanji in characters" 
+				v-for="kanji in modelData.characters" 
 				:key="kanji.kanji" 
 				:kanji="kanji.kanji" 
 				:attachedMeaning="kanji.attachedMeaning"
@@ -16,11 +16,9 @@
 <script setup lang='ts'>
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
+	import { useKanjiState } from '@/stores/kanjistate'
 
-	defineProps<{
-		characters: {kanji: string; correctMeaning: string; attachedMeaning: string; incorrect: boolean | null;}[]
-	}>()
-	
+	const { modelData } = useKanjiState()
 </script>
 
 <style scoped>

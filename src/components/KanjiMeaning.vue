@@ -1,6 +1,10 @@
 <template>
-	<DraggableWrapper>
-		<div :id="`meaning-node-${meaning}`" class="container" :class="attached">
+		<div 
+			class="container"
+			:class="attached"
+			ref="containerElement"
+			@pointerdown.prevent.stop="onPointerDown"
+		>
 			<div>
 				<div class="puzzle-hole-container">
 					<div :class="puzzleHoleClasses">
@@ -12,16 +16,19 @@
 				</div>
 			</div>
 		</div>
-	</DraggableWrapper>
 </template>
 
 <script setup lang='ts'>
-	import { computed } from 'vue'
-	import DraggableWrapper from './DraggableWrapper.vue'
+	import { ref, computed } from 'vue'
+	import { useDragAndDrop } from '@/stores/draganddrop'
+
+	const containerElement = ref<HTMLElement | null>(null)
+	const store = useDragAndDrop()
 	const props = defineProps({
 		meaning: String,
 		attachedCharacter: String
 	});	
+
 	const puzzleHoleClasses = computed(() => {
 		const classes = ['puzzle-hole']
 		if(props.attachedCharacter) {
@@ -36,6 +43,17 @@
 			return ""
 		}
 	})
+
+	function onPointerDown(_: PointerEvent) {
+		if(!containerElement.value) throw new Error("Clicked on meaning but ref is null")
+		if(!props.meaning) throw new Error("Clicked on meaning but meaning prop is null")
+
+		store.setDragging({
+			element: containerElement.value,
+			meaning: props.meaning,
+			draggingAttachedCharacter: props.attachedCharacter
+		})
+	}
 </script>
 
 <style scoped>
