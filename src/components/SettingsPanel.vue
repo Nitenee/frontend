@@ -233,6 +233,11 @@
 		box-shadow: inset 0px 0px 2px #0004;
 		transition: color 0.3s;
 	}
+	input[type="text"]:not(:disabled):hover,
+	input[type="password"]:not(:disabled):hover,
+	input[type="number"]:not(:disabled):hover {
+		cursor: text;
+	}
 	input::-webkit-outer-spin-button,
 	input::-webkit-inner-spin-button {
 		-webkit-appearance: none;

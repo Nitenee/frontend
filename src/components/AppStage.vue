@@ -1,10 +1,15 @@
 <template>
-	<div id="stage" :class="toggleSettingsStyle" @pointerup="unsetDragging">
+	<div id="stage"
+		:class="toggleSettingsStyle"
+		@pointermove="onPointerMove"
+		@pointerup="unsetDragging"
+	>
 		<PopOver 
 			:popoverText="popoverText"
 			:popoverSubtext="popoverSubtext"
 			ref="popover" 
 		/>
+		<DragIllusion />
 		<NavBar @togglesettings="toggleSettings" />
 		<div ref="puzzleStage" id="puzzle-stage">
 			<KanjiMeaningSection @on-submit="onSubmit" />
@@ -28,6 +33,7 @@
 
 	import NavBar from '@/components/NavBar.vue'
 	import PopOver from '@/components/PopOver.vue'
+	import DragIllusion from '@/components/DragIllusion.vue'
 	import KanjiMeaningSection from '@/components/KanjiMeaningsSection.vue'
 	import KanjiCharacterSection from '@/components/KanjiCharacterSection.vue'
 	import SettingsPanel from '@/components/SettingsPanel.vue'
@@ -55,6 +61,11 @@
 
 	function unsetDragging() {
 		dragAndDrop.clearDragging()
+	}
+
+	function onPointerMove(e: PointerEvent) {
+		dragAndDrop.setPointerPosition({ x: e.x, y: e.y })
+		dragAndDrop.checkCursor()
 	}
 
 	function onSubmit() {
@@ -89,8 +100,8 @@
 				state.setReadyToGoToNextKanjiBatch(true)
 				setTimeout(() => {
 					popoverHide()
-				}, 500)
-			}, 500)
+				}, 1000)
+			}, 1000)
 		}
 	}
 
@@ -106,6 +117,7 @@
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		popover.value.popover.style.opacity = '1'
+		popover.value.popover.style.backdropFilter = 'blur(5px)'
 	}
 
 	function popoverHide() {
@@ -116,6 +128,7 @@
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		popover.value.popover.style.opacity = '0'
+		popover.value.popover.style.backdropFilter = 'blur(0px)'
 	}
 
 
@@ -167,9 +180,9 @@
 			let request = apiRequest(message)
 			request.then((newKanji: ServerKanji) => {
 				updateKanji(newKanji)
-				setTimeout(popoverHide, 500)
+				setTimeout(popoverHide, 1000)
 			})
-		}, 500)
+		}, 1000)
 	}
 
 	function updateKanji(newKanji: ServerKanji) {
@@ -201,5 +214,8 @@
 	}
 	#stage.showSettings #puzzle-stage {
 		width: calc(100vw - 20px);
+	}
+	.dragging-cursor {
+		cursor: grabbing !important; /* Don't allow override while dragging!!! */
 	}
 </style>

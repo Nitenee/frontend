@@ -19,7 +19,6 @@ export const useKanjiState = defineStore('kanji-state', () => {
 	}
 
 	function setModelData(inMeanings: string[], inCharacters: CharacterInfo[]) {
-		console.log('setting model data', inMeanings, inCharacters)
 		modelData.meanings = inMeanings
 		modelData.characters = inCharacters
 	}

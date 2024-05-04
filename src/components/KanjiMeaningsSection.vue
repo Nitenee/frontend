@@ -1,15 +1,17 @@
 <template>
 	<section class="kanji-meanings">
-		<div class="button-container">
-			<div>
-				<button class="submit-button" :class="continueStyle" @click.prevent="emit('onSubmit')">
-					{{ submitButtonText }}
-				</button>
+		<div class="curve">
+			<div class="button-container">
+				<div>
+					<button class="submit-button" :class="continueStyle" @click.prevent="emit('onSubmit')">
+						{{ submitButtonText }}
+					</button>
+				</div>
 			</div>
 		</div>
 		<div class="kanji-meaning-items-container">
-			<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
 			<div>
+				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
 				<KanjiMeaning 
 					v-for="meaning in state.modelData.meanings" 
 					:key="meaning" 
@@ -42,26 +44,29 @@
 	.kanji-meanings {
 		height: calc(100dvh - 64px);
 		min-width: 200px;
-		background-color: #51576d;
+		background-color: #414559;
 	}
 	.kanji-meaning-items-container {
-		position: relative;
 		height: calc(100% - 110px);
 		background-color: #414559;
-		box-shadow: inset 0px 0px 2px 2px #0007;
+		box-shadow: inset 2px -2px 2px #0007;
 	}
 	.kanji-meaning-items-container > div {
+		position: relative;
+		direction: rtl;
 		height: 100%;
 		padding-top: 20px;
-		overflow-y: scroll;
+		overflow-y: auto;
 		scrollbar-color: #838ba7 #626880;
 		scrollbar-width: thin;
 	}
 	.button-container {
 		position: relative;
-		z-index: 10;
 		padding-top: 10px;
 		padding-bottom: 20px;
+		background-color: #51576d;
+		border-bottom-right-radius: 15px;
+		box-shadow: 0px 3px 3px 0px #0007;
 	}
 	.button-container div {
 		margin: auto;

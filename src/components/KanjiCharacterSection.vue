@@ -24,7 +24,7 @@
 <style scoped>
 	.kanji-characters-container {
 		position: relative;
-		height: 100%;
+		height: calc(100vh - 64px);
 		width: calc(100vw - 500px);
 		min-width: 200px;
 		flex-grow: 1;
