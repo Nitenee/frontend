@@ -33,8 +33,8 @@
 	const state = useKanjiState()
 
 	function onPointerUp(_: PointerEvent) {
-		if(dragAndDrop.draggingAttachedCharacter == undefined || dragAndDrop.draggingMeaning == null) throw new Error("Trying to drop an undefined or null")
 		if(dragAndDrop.isDragging) {
+			if(dragAndDrop.draggingAttachedCharacter == undefined || dragAndDrop.draggingMeaning == null) throw new Error("Trying to drop an undefined or null")
 			state.processDrop({
 				goingToCharacter: props.kanji,
 				comingFromCharacter: dragAndDrop.draggingAttachedCharacter,
@@ -43,17 +43,6 @@
 			})
 			dragAndDrop.clearDragging()
 		}
-	}
-
-	function onDrop(e: DragEvent) {
-		if(!e.dataTransfer) throw new Error("Missing dataTransfer on drop event")
-		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
-		emit('dropmeaning', {
-			goingToCharacter: props.kanji,
-			comingFromCharacter: attachedCharacter,
-			oldMeaning: props.attachedMeaning,
-			newMeaning: meaning
-		})
 	}
 </script>
 
@@ -67,6 +56,7 @@
 		border: 5px solid #51576d;
 		transition: scale 0.3s, border 0.3s, background-color 0.3s, box-shadow 0.3s;
 		box-shadow: 2px 2px 2px #0004;
+		user-select: none;
 	}
 	.kanji:hover {
 		scale: 1.1;
