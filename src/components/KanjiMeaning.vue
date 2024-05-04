@@ -61,6 +61,7 @@
 		margin: auto;
 		width: 100px;
 		transition: translate 0.3s;
+		user-select: none;
 	}
 	.container:hover {
 		cursor: grab;

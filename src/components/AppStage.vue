@@ -70,7 +70,7 @@
 
 	function onSubmit() {
 		if (state.readyToGoToNextKanjiBatch) {
-			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
+			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
 		} else {
 			checkAnswers()
 		}
@@ -93,9 +93,9 @@
 		})
 
 		if(allAnswersCorrect && settings.autoContinue) {
-			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
+			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
 		} else if(allAnswersCorrect) {
-			popoverShow("グッドジョブ！", "Looking good!")
+			popoverShow("グッドジョブ！", "Looking good!", true)
 			setTimeout(() => {
 				state.setReadyToGoToNextKanjiBatch(true)
 				setTimeout(() => {
@@ -105,7 +105,7 @@
 		}
 	}
 
-	function popoverShow(popupText: string, popupSubtext: string) {
+	function popoverShow(popupText: string, popupSubtext: string, animate: boolean) {
 		if(!popupText || !popupSubtext) throw new Error("You must enter popup text")
 		if(!popover.value || !popover.value.popover) throw new Error ("popover ref is null")
 		popoverText.value = popupText
@@ -116,8 +116,10 @@
 		popover.value.popover.style.pointerEvents = 'initial'
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		popover.value.popover.style.opacity = '1'
-		popover.value.popover.style.backdropFilter = 'blur(5px)'
+		popover.value.popover.classList.add('show')
+		if(animate) {
+			popover.value.popover.classList.add('animate')
+		}
 	}
 
 	function popoverHide() {
@@ -127,8 +129,8 @@
 		popover.value.popover.style.pointerEvents = 'none'
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		popover.value.popover.style.opacity = '0'
-		popover.value.popover.style.backdropFilter = 'blur(0px)'
+		popover.value.popover.classList.remove('show')
+		popover.value.popover.classList.remove('animate')
 	}
 
 
@@ -145,22 +147,22 @@
 
 	function updateSettings() {
 		if(!wanikaniLevel.value && settings.wanikaniAPIKey) {
-			popoverShow("ちょい待ちこ", "Fetching Wanikani info...")
+			popoverShow("ちょい待ちこ", "Fetching Wanikani info...", false)
 			wanikaniRequest(settings.wanikaniAPIKey).then(userData => {
 				wanikaniLevel.value = userData.data.level
 				wanikaniUsername.value = userData.data.username
 				toggleSettings()
-				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
+				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 			})
 
 		} else {
 			toggleSettings()
-			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
+			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 		}
 	}
 
-	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
-		popoverShow(popoverText, popoverSubtext)
+	function getNextKanjiBatch(popoverText: string, popoverSubtext: string, animate: boolean) {
+		popoverShow(popoverText, popoverSubtext, animate)
 		setTimeout(() => {
 			state.setReadyToGoToNextKanjiBatch(false)
 			let maxLevelRequest = settings.levelLimitUpper

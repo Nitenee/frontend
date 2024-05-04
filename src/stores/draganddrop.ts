@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive } from 'vue'
 
 interface PointerPosition {
 	x: number;
