@@ -238,6 +238,9 @@
 	input[type="number"]:not(:disabled):hover {
 		cursor: text;
 	}
+	input[type=number] {
+			-moz-appearance:textfield;
+	}
 	input::-webkit-outer-spin-button,
 	input::-webkit-inner-spin-button {
 		-webkit-appearance: none;
