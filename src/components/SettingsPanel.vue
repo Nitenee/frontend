@@ -22,22 +22,15 @@
 				</div>
 				<div class="option-container">
 					<div class="option-title">
-						Batch Size
-					</div>
-					<div class="option-content">
-						<div class="batch-size">
-							<div class="flex-grow">Size</div>
-							<input type="number" @blur="checkLimits('batch')" v-model="store.batchSize"/>
-						</div>
-					</div>
-				</div>
-				<div class="option-container">
-					<div class="option-title">
 						Grouping
 					</div>
 					<div class="option-content">
+						<div class="batch-size">
+							<div class="flex-grow">Number of Groups</div>
+							<input type="number" @blur="checkLimits('batch')" v-model="store.batchSize"/>
+						</div>
 						<div class="group-kanji">
-							<div class="flex-grow">Group Similar Kanji</div>
+							<div class="flex-grow">Keep Groups Together</div>
 							<input type="checkbox" v-model="store.groupKanji" />
 						</div>
 					</div>
