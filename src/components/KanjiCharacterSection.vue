@@ -30,8 +30,15 @@
 		flex-grow: 1;
 		box-shadow: inset 0px 0px 2px 2px #0007;
 		background-color: #303446;
+		background-image: url('@/assets/images/hexbg.webp');
+		animation: backgroundpanner 10s linear infinite;
+	}
+	@keyframes backgroundpanner {
+		0% { background-position: 0px 0px; }
+		100% { background-position: 60px 52px; }
 	}
 	.kanji-characters {
+		position: relative;
 		display: flex;
 		flex-wrap: wrap;
 		align-content: center;
