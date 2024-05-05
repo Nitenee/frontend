@@ -163,6 +163,7 @@
 
 	function getNextKanjiBatch(popoverText: string, popoverSubtext: string, animate: boolean) {
 		popoverShow(popoverText, popoverSubtext, animate)
+		state.clearModelData()
 		setTimeout(() => {
 			state.setReadyToGoToNextKanjiBatch(false)
 			let maxLevelRequest = settings.levelLimitUpper
