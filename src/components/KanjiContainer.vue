@@ -1,14 +1,16 @@
 <template>
 	<div class="kanji" @pointerup.prevent.stop="onPointerUp">
-		<KanjiCharacter :character="kanji" :incorrect="incorrect" />
-		<div 
-			class="meaning-drop-zone"
-		>
-			<KanjiMeaning 
-				v-if="attachedMeaning"
-				:meaning="attachedMeaning" 
-				:attachedCharacter="kanji"
-			/>
+		<div>
+			<KanjiCharacter :character="kanji" :incorrect="incorrect" />
+			<div 
+				class="meaning-drop-zone"
+			>
+				<KanjiMeaning 
+					v-if="attachedMeaning"
+					:meaning="attachedMeaning" 
+					:attachedCharacter="kanji"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -47,22 +49,21 @@
 </script>
 
 <style scoped>
-	.kanji {
+	.kanji > div {
 		display: flex;
 		flex-direction: column;
 		background-color: #414559;
 		padding: 5px;
 		border-radius: 15px;
-		border: 5px solid #51576d;
-		transition: scale 0.3s, border 0.3s, background-color 0.3s, box-shadow 0.3s;
-		box-shadow: 2px 2px 2px #0004;
+		border: 5px solid #737994;
+		transition: all 0.15s ease;
 		user-select: none;
 	}
-	.kanji:hover {
-		scale: 1.1;
+	.kanji:hover > div {
+		scale: 1.2;
 		border: 5px solid #ca9ee6;
 		background-color: #626880;
-		box-shadow: 4px 4px 8px #0003;
+		box-shadow: 0px 0px 2px 0px #000a;
 	}
 	.meaning-drop-zone {
 		margin-top: -32px;

@@ -64,7 +64,7 @@
 		transform-origin: 50% 50%;
 	}
 	.container > div {
-		transition: translate 0.3s;
+		transition: translate 0.15s;
 	}
 	.container:hover > div {
 		cursor: grab;
