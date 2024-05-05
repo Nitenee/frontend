@@ -1,59 +1,21 @@
 <template>
-	<div id="stage" :class="toggleSettingsStyle">
-		<div id="nice-job-popover" ref="popover">
-			<div id="nice-job-text">
-				<div>{{ popoverText }}</div>
-				<div>{{ popoverSubtext }}</div>
-			</div>
+	<div id="stage"
+		:class="toggleSettingsStyle"
+		@pointermove="onPointerMove"
+		@pointerup="unsetDragging"
+	>
+		<PopOver 
+			:popoverText="popoverText"
+			:popoverSubtext="popoverSubtext"
+			ref="popover" 
+		/>
+		<DragIllusion />
+		<NavBar @togglesettings="toggleSettings" />
+		<div ref="puzzleStage" id="puzzle-stage">
+			<KanjiMeaningSection @on-submit="onSubmit" />
+			<KanjiCharacterSection />
+			<SettingsPanel @settingsUpdated="updateSettings"/>
 		</div>
-		<nav>
-			<div class="app-name">
-				<div>似</div>
-				<div>て</div>
-				<div>ね</div>
-				<div>ー</div>
-				<div>！</div>
-			</div>
-			<div class="settings-button-container">
-				<button class="settings-button" @click.prevent="toggleSettings">
-					<CogWheelSVG />
-				</button>
-			</div>
-		</nav>
-		<section class="kanji-meanings" @dragover.prevent @drop="meaningSectionDropHandler">
-			<div class="button-container">
-				<div>
-					<button class="submit-button" @click.prevent="onSubmit">
-						{{ readyToGoToNextKanjiBatch ? "Continue" : "Check" }}
-					</button>
-				</div>
-			</div>
-			<div class="kanji-meaning-items-container">
-				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
-				<div v-if="modelData.meanings.length > 0">
-					<KanjiMeaning 
-						v-for="meaning in modelData.meanings" 
-						:key="meaning" 
-						:meaning="meaning" 
-						:attachedCharacter="''"
-					/>
-				</div>
-			</div>
-		</section>
-		<section class="kanji-characters-container" @dragover.prevent @drop="meaningSectionDropHandler">
-			<RoundedCorners :hideBottomLeft="true" />
-			<div class="kanji-characters" v-if="modelData.characters.length > 0">
-				<KanjiContainer 
-					v-for="kanji in modelData.characters" 
-					:key="kanji.kanji" 
-					:kanji="kanji.kanji" 
-					:attachedMeaning="kanji.attachedMeaning"
-					:incorrect="kanji.incorrect"
-					@dropmeaning="processDrop"
-				/>
-			</div>
-		</section>
-		<SettingsPanel @settingsUpdated="updateSettings"/>
 	</div>
 </template>
 
@@ -62,21 +24,29 @@
 		FIX:
 		Meanings not breaking mid word correctly
 	*/
-	import { ref, reactive, computed } from 'vue'
+	import { ref, computed } from 'vue'
 	import { useKanjiSettings } from '@/stores/kanjisettings'
+	import { useDragAndDrop } from '@/stores/draganddrop'
+	import { useKanjiState } from '@/stores/kanjistate'
 	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
-	import { ServerKanji, KanjiBatchRequest, NDropEvent } from '@/utils/types'
-	import KanjiMeaning from '@/components/KanjiMeaning.vue'
-	import KanjiContainer from '@/components/KanjiContainer.vue'
-	import RoundedCorners from '@/components/RoundedCorners.vue'
-	import SettingsPanel from '@/components/SettingsPanel.vue'
-	import CogWheelSVG from './CogWheelSVG.vue'
+	import { ServerKanji, KanjiBatchRequest } from '@/utils/types'
 
-	const store = useKanjiSettings()
+	import NavBar from '@/components/NavBar.vue'
+	import PopOver from '@/components/PopOver.vue'
+	import DragIllusion from '@/components/DragIllusion.vue'
+	import KanjiMeaningSection from '@/components/KanjiMeaningsSection.vue'
+	import KanjiCharacterSection from '@/components/KanjiCharacterSection.vue'
+	import SettingsPanel from '@/components/SettingsPanel.vue'
+
+	const settings = useKanjiSettings()
+	const dragAndDrop = useDragAndDrop()
+	const state = useKanjiState()
+	const puzzleStage = ref<HTMLElement | null>(null)
+
+	state.setCheckAnswers(autoCheckAnswers)
 
 	let wanikaniLevel = ref<number | null>(null)
 	let wanikaniUsername = ref("")
-	let readyToGoToNextKanjiBatch = ref(false)
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
@@ -88,33 +58,33 @@
 			return ""
 		}
 	})
-	const modelData = reactive({
-		meanings: [] as string[],
-		characters: [] as {kanji: string; correctMeaning: string; attachedMeaning: string; incorrect: boolean | null;}[]
-	})
 
-	function meaningSectionDropHandler(e: DragEvent) {
-		if(!e.dataTransfer) throw new Error("Trying to drop but no dataTransfer object exists on event")
-		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
-		processDrop({
-			goingToCharacter: "MEANINGZONE",
-			comingFromCharacter: attachedCharacter,
-			oldMeaning: "MEANINGZONE",
-			newMeaning: meaning
-		})
+	function unsetDragging() {
+		dragAndDrop.clearDragging()
+	}
+
+	function onPointerMove(e: PointerEvent) {
+		dragAndDrop.setPointerPosition({ x: e.x, y: e.y })
+		dragAndDrop.checkCursor()
 	}
 
 	function onSubmit() {
-		if (readyToGoToNextKanjiBatch.value) {
-			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
+		if (state.readyToGoToNextKanjiBatch) {
+			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
 		} else {
+			checkAnswers()
+		}
+	}
+
+	function autoCheckAnswers() {
+		if(state.modelData.meanings.length <= 0 && settings.autoCheck) {
 			checkAnswers()
 		}
 	}
 
 	function checkAnswers() {
 		let allAnswersCorrect = true
-		modelData.characters.forEach(character => {
+		state.modelData.characters.forEach(character => {
 			let correct = character.correctMeaning == character.attachedMeaning
 			if(!correct) {
 				allAnswersCorrect = false
@@ -122,117 +92,99 @@
 			character.incorrect = !correct
 		})
 
-		if(allAnswersCorrect && store.autoContinue) {
-			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...")
+		if(allAnswersCorrect && settings.autoContinue) {
+			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
 		} else if(allAnswersCorrect) {
-			popoverShow("グッドジョブ！", "Looking good!")
+			popoverShow("グッドジョブ！", "Looking good!", true)
 			setTimeout(() => {
-				readyToGoToNextKanjiBatch.value = true
+				state.setReadyToGoToNextKanjiBatch(true)
 				setTimeout(() => {
 					popoverHide()
-				}, 500)
-			}, 500)
+				}, 1000)
+			}, 1000)
 		}
 	}
 
-	function popoverShow(popupText: string, popupSubtext: string) {
+	function popoverShow(popupText: string, popupSubtext: string, animate: boolean) {
 		if(!popupText || !popupSubtext) throw new Error("You must enter popup text")
-		if(!popover.value) throw new Error ("popover ref is null")
+		if(!popover.value || !popover.value.popover) throw new Error ("popover ref is null")
 		popoverText.value = popupText
 		popoverSubtext.value = popupSubtext
-		popover.value.style.pointerEvents = 'initial'
-		popover.value.style.opacity = '1'
+		// TypeScript weirding out about this syntax
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		popover.value.popover.style.pointerEvents = 'initial'
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		popover.value.popover.classList.add('show')
+		if(animate) {
+			popover.value.popover.classList.add('animate')
+		}
 	}
 
 	function popoverHide() {
-		if(!popover.value) throw new Error ("popover ref is null")
-		popover.value.style.pointerEvents = 'none'
-		popover.value.style.opacity = '0'
+		if(!popover.value || !popover.value.popover) throw new Error ("popover ref is null")
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		popover.value.popover.style.pointerEvents = 'none'
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		popover.value.popover.classList.remove('show')
+		popover.value.popover.classList.remove('animate')
 	}
 
-	function processDrop(e: NDropEvent) {
-		const { goingToCharacter, comingFromCharacter, oldMeaning, newMeaning  } = e
-		if(goingToCharacter === "MEANINGZONE") {
-			//Ignore drop if picked up and dropped in meaning zone
-			if(modelData.meanings.find(m => m == newMeaning)) return
-
-			let char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-			if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
-
-			char.attachedMeaning = ""
-			modelData.meanings.push(newMeaning)
-			return
-		}
-
-		if(comingFromCharacter && oldMeaning) {
-			let char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-			if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
-
-			char.attachedMeaning = oldMeaning
-		} else if(!comingFromCharacter && oldMeaning) {
-			modelData.meanings.push(oldMeaning)
-		} else if(comingFromCharacter && !oldMeaning) {
-			let char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-			if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
-
-			char.attachedMeaning = ""
-		}
-
-		modelData.meanings = modelData.meanings.filter(m => m != newMeaning)
-
-		let char = modelData.characters.find(c => c.kanji == goingToCharacter)
-		if(!char) throw new Error(`Unable to find ${goingToCharacter} in modelData.characters while trying to set attachedMeaning to newMeaning`)
-		char.attachedMeaning = newMeaning
-
-		if(modelData.meanings.length <= 0 && store.autoCheck) {
-			checkAnswers()
-		}
-	}
 
 	function toggleSettings() {
+		//Programmatically add and remove transition so there's no strange animations on window resize
+		if(!puzzleStage.value) throw new Error("Tried to access puzzleStage ref but it's null")
+		puzzleStage.value.style.transition = 'width 1s cubic-bezier(.75,0,.25,1)'
+		setTimeout(() => {
+			if(!puzzleStage.value) throw new Error("Tried to access puzzleStage ref but it's null")
+			puzzleStage.value.style.transition = ''
+		}, 1000)
 		showSettings.value = !showSettings.value
 	}
 
 	function updateSettings() {
-		if(!wanikaniLevel.value && store.wanikaniAPIKey) {
-			popoverShow("ちょい待ちこ", "Fetching Wanikani info...")
-			wanikaniRequest(store.wanikaniAPIKey).then(userData => {
+		if(!wanikaniLevel.value && settings.wanikaniAPIKey) {
+			popoverShow("ちょい待ちこ", "Fetching Wanikani info...", false)
+			wanikaniRequest(settings.wanikaniAPIKey).then(userData => {
 				wanikaniLevel.value = userData.data.level
 				wanikaniUsername.value = userData.data.username
 				toggleSettings()
-				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
+				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 			})
 
 		} else {
 			toggleSettings()
-			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...")
+			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 		}
 	}
 
-	function getNextKanjiBatch(popoverText: string, popoverSubtext: string) {
-		popoverShow(popoverText, popoverSubtext)
+	function getNextKanjiBatch(popoverText: string, popoverSubtext: string, animate: boolean) {
+		popoverShow(popoverText, popoverSubtext, animate)
 		setTimeout(() => {
-			readyToGoToNextKanjiBatch.value = false
-			let maxLevelRequest = store.levelLimitUpper
-			if(store.useWanikaniLevel && wanikaniLevel.value && wanikaniUsername) {
+			state.setReadyToGoToNextKanjiBatch(false)
+			let maxLevelRequest = settings.levelLimitUpper
+			if(settings.useWanikaniLevel && wanikaniLevel.value && wanikaniUsername) {
 				maxLevelRequest = wanikaniLevel.value
 			}
 			let message: KanjiBatchRequest = {
 				type: "KanjiBatchRequest",
 				data: {
 					user_id: wanikaniUsername.value,
-					group_count: store.batchSize,
+					group_count: settings.batchSize,
 					max_level: maxLevelRequest,
-					min_level: store.levelLimitLower,
+					min_level: settings.levelLimitLower,
 					min_group_size: 2,
 				}
 			}
 			let request = apiRequest(message)
 			request.then((newKanji: ServerKanji) => {
 				updateKanji(newKanji)
-				setTimeout(popoverHide, 500)
+				setTimeout(popoverHide, 1000)
 			})
-		}, 500)
+		}, 1000)
 	}
 
 	function updateKanji(newKanji: ServerKanji) {
@@ -247,195 +199,25 @@
 				incorrect: null
 			})
 		}
-		modelData.meanings = shuffleArray(meanings)
-		modelData.characters = shuffleArray(characters)
+		state.setModelData(shuffleArray(meanings), shuffleArray(characters))
 	}
 </script>
 
 <style scoped>
 	#stage {
-		display: grid;
-		grid-template-rows: 60px 1fr;
-		grid-template-columns: 200px 1fr 0;
+		display: flex;
+		flex-direction: column;
 		height: calc(100dvh - 4px);
 		overflow: hidden;
-		transition: grid-template-columns 1s cubic-bezier(.75,0,.25,1);
 	}
-	#stage.showSettings {
-		grid-template-columns: 200px 1fr 300px;
-	}
-	nav {
-		grid-column: span 3;
+	#puzzle-stage {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		width: calc(100vw + 295px);
 	}
-	.app-name {
-		margin-left: 10px;
-		display: flex;
-		user-select: none;
-		font-family: 'MikanNoki';
-		font-size: 50px;
-		font-weight: bold;
-		color: #c6d0f5;
-		-webkit-text-stroke: 1.5pt #303446;
-		text-shadow: 2px 2px 2px #0007;
-		letter-spacing: -10px;
-		transition: translate 0.3s, text-shadow 0.3s;
+	#stage.showSettings #puzzle-stage {
+		width: calc(100vw - 20px);
 	}
-	.app-name:hover {
-		translate: -2px -2px;
-		text-shadow: 4px 4px 8px #0007;
-	}
-	.app-name div:nth-child(odd) {
-		translate: 0 -5px;
-	}
-	.app-name div:nth-child(even) {
-		translate: 0 5px;
-	}
-	.app-name div:nth-child(7) {
-		translate: 0 0px;
-	}
-	.settings-button-container {
-		margin-right: 10px;
-		display: flex;
-		width: 80px;
-		height: 50px;
-		padding: 5px 10px;
-		align-items: center;
-		justify-content: center;
-		background-color: #414559;
-		border-radius: 10px;
-		box-shadow: 2px 2px 2px #0004;
-		transition: translate 0.3s, box-shadow 0.3s;
-	}
-	.settings-button-container:hover {
-		translate: 1px 1px;
-		box-shadow: 1px 1px 1px #0007;
-	}
-	.settings-button {
-		all: unset;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin: auto;
-		width: 150px;
-		height: 35px;
-		border-radius: 5px;
-		font-size: 20px;
-		background-color: #737994;
-		box-shadow: 2px 2px 2px #0004;
-		transition: translate 0.3s, box-shadow 0.3s;
-	}
-	.settings-button:hover {
-		translate: -2px -2px;
-		box-shadow: 4px 4px 8px #0004;
-		background-color: #838ba7;
-		cursor: pointer;
-	}
-	.settings-button svg {
-		fill: #c6d0f5;
-		transition: rotate 0.3s, fill 0.3s;
-		filter: drop-shadow(1px 1px #0007);
-	}
-	.settings-button:hover svg {
-		rotate: 90deg;
-	}
-	.kanji-characters-container {
-		position: relative;
-		height: calc(100% - 64px);
-		box-shadow: inset 0px 0px 2px 2px #0007;
-		background-color: #303446;
-	}
-	.kanji-characters {
-		display: flex;
-		flex-wrap: wrap;
-		align-content: center;
-		justify-content: space-evenly;
-		gap: 20px;
-		padding: 20px;
-		height: 100dvh;
-		overflow-y: auto;
-		scrollbar-gutter: stable both-edges;
-		scrollbar-color: #838ba7 #626880;
-		scrollbar-width: thin;
-	}
-	.kanji-meanings {
-		height: calc(100dvh - 64px);
-		background-color: #51576d;
-	}
-	.kanji-meaning-items-container {
-		position: relative;
-		height: calc(100% - 110px);
-		background-color: #414559;
-		box-shadow: inset 0px 0px 2px 2px #0007;
-	}
-	.kanji-meaning-items-container > div {
-		height: 100%;
-		padding-top: 20px;
-		overflow-y: scroll;
-		scrollbar-color: #838ba7 #626880;
-		scrollbar-width: thin;
-	}
-	.button-container {
-		position: relative;
-		z-index: 10;
-		padding-top: 10px;
-		padding-bottom: 20px;
-	}
-	.button-container div {
-		margin: auto;
-		display: flex;
-		align-items: center;
-		width: 90%;
-		height: 80px;
-		background-color: #414559;
-		border-radius: 10px;
-		box-shadow: 2px 2px 2px #0004;
-		transition: translate 0.3s, box-shadow 0.3s;
-	}
-	.button-container div:has(> .submit-button:hover) {
-		box-shadow: 1px 1px 1px #0007;
-		translate: 1px 1px;
-	}
-	.submit-button {
-		all: unset;
-		display: block;
-		margin: auto;
-		width: 150px;
-		height: 50px;
-		text-align: center;
-		border-radius: 5px;
-		font-size: 20px;
-		background-color: #babbf1;
-		box-shadow: 2px 2px 2px #0004;
-		transition: translate 0.3s, box-shadow 0.3s;
-	}
-	.submit-button:hover {
-		cursor: pointer;
-		background-color: #cacbff;
-		box-shadow: 4px 4px 8px #0004;
-		translate: -2px -2px;
-	}
-	#nice-job-popover {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		background-color: #000e;
-		color: #c6d0f5;
-		font-size: 80px;
-		font-weight: bold;
-		display: grid;
-		grid-template-rows: 1fr 1fr;
-		place-items: center;
-		opacity: 0;
-		pointer-events: none;
-		user-select: none;
-		transition: opacity 0.25s;
-		z-index: 50;
-		text-align: center;
-	}
-	#nice-job-text div:last-child {
-		font-size: 30px;
+	.dragging-cursor {
+		cursor: grabbing !important; /* Don't allow override while dragging!!! */
 	}
 </style>

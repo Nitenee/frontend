@@ -1,5 +1,5 @@
 <template>
-	<div class="kanji" @drop.prevent.stop="onDrop" @dragover.prevent>
+	<div class="kanji" @pointerup.prevent.stop="onPointerUp">
 		<KanjiCharacter :character="kanji" :incorrect="incorrect" />
 		<div 
 			class="meaning-drop-zone"
@@ -20,6 +20,8 @@
 	*/
 	import KanjiCharacter from '@/components/KanjiCharacter.vue'
 	import KanjiMeaning   from '@/components/KanjiMeaning.vue'
+	import { useDragAndDrop } from '@/stores/draganddrop'
+	import { useKanjiState } from '@/stores/kanjistate'
 
 	const props = defineProps<{
 		kanji: string,
@@ -27,16 +29,20 @@
 		incorrect: boolean | null
 	}>()
 	const emit  = defineEmits(['dropmeaning'])
+	const dragAndDrop = useDragAndDrop()
+	const state = useKanjiState()
 
-	function onDrop(e: DragEvent) {
-		if(!e.dataTransfer) throw new Error("Missing dataTransfer on drop event")
-		const { meaning, attachedCharacter} = JSON.parse(e.dataTransfer.getData("text"))
-		emit('dropmeaning', {
-			goingToCharacter: props.kanji,
-			comingFromCharacter: attachedCharacter,
-			oldMeaning: props.attachedMeaning,
-			newMeaning: meaning
-		})
+	function onPointerUp(_: PointerEvent) {
+		if(dragAndDrop.isDragging) {
+			if(dragAndDrop.draggingAttachedCharacter == undefined || dragAndDrop.draggingMeaning == null) throw new Error("Trying to drop an undefined or null")
+			state.processDrop({
+				goingToCharacter: props.kanji,
+				comingFromCharacter: dragAndDrop.draggingAttachedCharacter,
+				oldMeaning: props.attachedMeaning,
+				newMeaning: dragAndDrop.draggingMeaning
+			})
+			dragAndDrop.clearDragging()
+		}
 	}
 </script>
 
@@ -50,6 +56,7 @@
 		border: 5px solid #51576d;
 		transition: scale 0.3s, border 0.3s, background-color 0.3s, box-shadow 0.3s;
 		box-shadow: 2px 2px 2px #0004;
+		user-select: none;
 	}
 	.kanji:hover {
 		scale: 1.1;

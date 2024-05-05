@@ -7,11 +7,26 @@
 				</div>
 				<div class="option-container">
 					<div class="option-title">
+						Answer Checking
+					</div>
+					<div class="option-content">
+						<div class="group-kanji">
+							<div class="flex-grow">Auto-Check</div>
+							<input type="checkbox" v-model="store.autoCheck" />
+						</div>
+						<div class="group-kanji">
+							<div class="flex-grow">Auto-Continue</div>
+							<input type="checkbox" v-model="store.autoContinue" />
+						</div>
+					</div>
+				</div>
+				<div class="option-container">
+					<div class="option-title">
 						Batch Size
 					</div>
 					<div class="option-content">
 						<div class="batch-size">
-							<div>Size</div>
+							<div class="flex-grow">Size</div>
 							<input type="number" @blur="checkLimits('batch')" v-model="store.batchSize"/>
 						</div>
 					</div>
@@ -22,23 +37,8 @@
 					</div>
 					<div class="option-content">
 						<div class="group-kanji">
-							<div class="level-limit-option-title">Group Similar Kanji</div>
+							<div class="flex-grow">Group Similar Kanji</div>
 							<input type="checkbox" v-model="store.groupKanji" />
-						</div>
-					</div>
-				</div>
-				<div class="option-container">
-					<div class="option-title">
-						Answer Checking
-					</div>
-					<div class="option-content">
-						<div class="group-kanji">
-							<div class="level-limit-option-title">Auto-Check</div>
-							<input type="checkbox" v-model="store.autoCheck" />
-						</div>
-						<div class="group-kanji">
-							<div class="level-limit-option-title">Auto-Continue</div>
-							<input type="checkbox" v-model="store.autoContinue" />
 						</div>
 					</div>
 				</div>
@@ -46,15 +46,15 @@
 					<div class="option-title">Level Limits</div>
 					<div class="option-content">
 						<div class="level-limit">
-							<div class="level-limit-option-title" :class="upperLimitDisabled">Upper Limit</div>
+							<div class="flex-grow" :class="upperLimitDisabled">Upper Limit</div>
 							<input type="number" @blur="checkLimits('upper')" v-model="store.levelLimitUpper" :disabled="store.useWanikaniLevel" />
 						</div>
 						<div class="level-limit">
-							<div class="level-limit-option-title">Lower Limit</div>
+							<div class="flex-grow">Lower Limit</div>
 							<input type="number" @blur="checkLimits('lower')" v-model="store.levelLimitLower" />
 						</div>
 						<div class="level-limit">
-							<div class="level-limit-option-title">Use WaniKani Level</div>
+							<div class="flex-grow">Use WaniKani Level</div>
 							<input type="checkbox" v-model="store.useWanikaniLevel" />
 						</div>
 					</div>
@@ -160,6 +160,7 @@
 	}
 	.settings-panel-container {
 		height: 100%;
+		width: 300px;
 		padding: 10px;
 		background-color: #414559;
 		border-radius: 20px;
@@ -232,6 +233,11 @@
 		box-shadow: inset 0px 0px 2px #0004;
 		transition: color 0.3s;
 	}
+	input[type="text"]:not(:disabled):hover,
+	input[type="password"]:not(:disabled):hover,
+	input[type="number"]:not(:disabled):hover {
+		cursor: text;
+	}
 	input::-webkit-outer-spin-button,
 	input::-webkit-inner-spin-button {
 		-webkit-appearance: none;
@@ -253,9 +259,11 @@
 	.batch-size,
 	.group-kanji,
 	.level-limit {
-		display: grid;
-		grid-template-columns: 1fr 50px;
-		justify-items: center;
+		display: flex;
+	}
+	.flex-grow {
+		text-align: center;
+		flex-grow: 1;
 	}
 	.wanikani {
 		text-align: center;
