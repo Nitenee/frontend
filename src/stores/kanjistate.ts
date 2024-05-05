@@ -28,6 +28,10 @@ export const useKanjiState = defineStore('kanji-state', () => {
 	function setModelDataCharacters(inCharacters: CharacterInfo[]) {
 		modelData.characters = inCharacters
 	}
+	function clearModelData() {
+		modelData.meanings = [] as string[]
+		modelData.characters = [] as CharacterInfo[]
+	}
 
 	function processDrop(e: NDropEvent) {
 		const { goingToCharacter, comingFromCharacter, oldMeaning, newMeaning  } = e
@@ -78,6 +82,7 @@ export const useKanjiState = defineStore('kanji-state', () => {
 		setModelData,
 		setModelDataMeanings,
 		setModelDataCharacters,
+		clearModelData,
 		setReadyToGoToNextKanjiBatch,
 		setCheckAnswers,
 		

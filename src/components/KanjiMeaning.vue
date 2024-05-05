@@ -60,14 +60,17 @@
 	.container {
 		margin: auto;
 		width: 100px;
-		transition: translate 0.3s;
 		user-select: none;
+		transform-origin: 50% 50%;
 	}
-	.container:hover {
+	.container > div {
+		transition: translate 0.15s;
+	}
+	.container:hover > div {
 		cursor: grab;
 		translate: -2px -2px;
 	}
-	.container.attached:hover {
+	.container.attached:hover > div{
 		translate: 0px 10px;
 	}
 	.meaning {

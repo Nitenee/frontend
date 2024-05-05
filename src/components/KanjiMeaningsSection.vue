@@ -10,21 +10,27 @@
 			</div>
 		</div>
 		<div class="kanji-meaning-items-container">
-			<div>
+			<TransitionGroup 
+				tag="div" 
+				name="meaning" 
+				@enter="onEnter"
+			>
 				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
 				<KanjiMeaning 
-					v-for="meaning in state.modelData.meanings" 
+					v-for="(meaning, index) in state.modelData.meanings" 
 					:key="meaning" 
+					:data-index="index"
 					:meaning="meaning" 
 					:attachedCharacter="''"
 				/>
-			</div>
+			</TransitionGroup>
 		</div>
 	</section>
 </template>
 
 <script setup lang='ts'>
 	import { computed } from 'vue'
+	import gsap from 'gsap'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
 	import KanjiMeaning from '@/components/KanjiMeaning.vue'
 	import { useKanjiState } from '@/stores/kanjistate'
@@ -36,6 +42,22 @@
 	const continueStyle = computed(() => {
 		return state.readyToGoToNextKanjiBatch ? "continue" : ""
 	})
+
+	function onEnter(el: Element, done: () => void) {
+		gsap.fromTo(el, {
+			opacity: 0,
+			transform: 'translateX(-50px) scale(0.5)',
+		}, 
+		{
+			opacity: 1,
+			transform: 'translateX(0) scale(1)',
+			ease: "elastic.out",
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			delay: Number(el.dataset.index!) * 0.1 + 1.5,
+			onComplete: done
+		})
+	}
 
 	const emit = defineEmits(['onSubmit'])
 </script>

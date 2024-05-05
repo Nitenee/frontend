@@ -54,7 +54,7 @@
 		transition: backdrop-filter 0.25s;
 	}
 	.popover.show::after {
-		backdrop-filter: blur(2.5px);
+		/*backdrop-filter: blur(2.5px);*/
 	}
 	.popover > div {
 		position: relative;
