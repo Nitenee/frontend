@@ -93,7 +93,9 @@
 		})
 
 		if(allAnswersCorrect && settings.autoContinue) {
-			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
+			setTimeout(() => {
+				getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
+			}, 250)
 		} else if(allAnswersCorrect) {
 			popoverShow("グッドジョブ！", "Looking good!", true)
 			setTimeout(() => {
