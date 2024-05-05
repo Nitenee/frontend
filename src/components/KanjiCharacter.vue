@@ -50,6 +50,7 @@
 	.puzzle-hole {
 		translate: 0px -2px;
 		fill: #a6d189;
+		transition: fill 0.5s;
 	}
 	.puzzle-hole.incorrect {
 		fill: #e78284;
