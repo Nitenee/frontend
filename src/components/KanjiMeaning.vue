@@ -6,10 +6,10 @@
 			@pointerdown.prevent.stop="onPointerDown"
 		>
 			<div>
-				<div class="puzzle-hole-container">
-					<div :class="puzzleHoleClasses">
-						<div class="puzzle-hole-shadow-hider"></div>
-					</div>
+				<div class="puzzle-knob-container">
+					<svg class="puzzle-knob" height="32" width="100">
+						<path d="m 20 30 C 25 30 30 25 30 20 V 12 C 30 7 35 2 40 2 H 60 C 65 2 70 7 70 12 V 20 C 70 25 75 30 80 30 L 100 30 L 100 32 L 0 32 L 0 30 z" />
+					</svg>
 				</div>
 				<div class="meaning" lang="en">
 					<span>{{ meaning }}</span>
@@ -64,14 +64,14 @@
 		transform-origin: 50% 50%;
 	}
 	.container > div {
-		transition: translate 0.15s;
+		transition: translate 0.15s, filter 0.15s;
 	}
 	.container:hover > div {
 		cursor: grab;
 		translate: -2px -2px;
 	}
 	.container.attached:hover > div{
-		translate: 0px 10px;
+		translate: 0px 0px;
 	}
 	.meaning {
 		margin-bottom: 20px;
@@ -96,49 +96,15 @@
 		width: 100%;
 		user-select: none;
 	}
-	.puzzle-hole-container {
-		display: flex;
-		justify-content: center;
-	}
-	.puzzle-hole {
-		position: relative;
-		width: 40px;
+	.puzzle-knob-container {
 		height: 30px;
-		background-color:	#81c8be;
-		border-top-left-radius: 10px;
-		border-top-right-radius: 10px;
-		box-shadow: 2px 2px 2px #0004;
-		transition: box-shadow 0.3s;
-		z-index: 1;
 	}
-	.container:not(:hover) .no-shadow {
-		box-shadow: initial;
+	.puzzle-knob {
+		fill: #81c8be;
 	}
-	.puzzle-hole::before {
-		position: absolute;
-		content: "";
-		left: 0;
-		transform: translateX(-100%);
-		border-bottom-right-radius: 10px;
-		width: 30px;
-		height: 30px;
-		box-shadow: 0px 10px 0px #81c8be;
+	.container.attached .meaning {
+		box-shadow: inherit;
+		margin-bottom: auto;
 	}
-	.puzzle-hole::after {
-		position: absolute;
-		content: "";
-		right: 0;
-		transform: translateX(100%);
-		border-bottom-left-radius: 10px;
-		width: 30px;
-		height: 30px;
-		box-shadow: 0px 10px 0px #81c8be;
-	}
-	.puzzle-hole-shadow-hider {
-		position: absolute;
-		width: 100%;
-		height: 10px;
-		bottom: -5px;
-		background-color: #81c8be;
-}
+	
 </style>

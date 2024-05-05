@@ -1,9 +1,14 @@
 <template>
-	<div class="kanji" @pointerup.prevent.stop="onPointerUp">
+	<div 
+		class="kanji"
+		@pointerup.prevent.stop="onPointerUp"
+		:class="attachedMeaning ? 'attached' : ''"
+	>
 		<div>
 			<KanjiCharacter :character="kanji" :incorrect="incorrect" />
 			<div 
 				class="meaning-drop-zone"
+				:class="attachedMeaning ? 'attached' : ''"
 			>
 				<KanjiMeaning 
 					v-if="attachedMeaning"
@@ -58,6 +63,7 @@
 		border: 5px solid #737994;
 		transition: all 0.15s ease;
 		user-select: none;
+		filter: drop-shadow(2px 2px 2px #0004);
 	}
 	.kanji:hover > div {
 		scale: 1.2;
@@ -65,10 +71,17 @@
 		background-color: #626880;
 		box-shadow: 0px 0px 2px 0px #000a;
 	}
+	.kanji.attached > div {
+		padding: 0;
+		margin: 5px;
+	}
 	.meaning-drop-zone {
 		margin-top: -32px;
 		height: 100px;
 		width: 100px;
 		z-index: 1;
+	}
+	.meaning-drop-zone.attached {
+		height: fit-content;
 	}
 </style>

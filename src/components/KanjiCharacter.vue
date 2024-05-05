@@ -4,9 +4,9 @@
 			<span>{{ character }}</span>
 		</div>
 		<div class="puzzle-hole-container">
-			<div class="puzzle-hole-corner left-corner" :class="incorrectStyle"></div>
-			<div class="puzzle-hole" :class="incorrectStyle"></div>
-			<div class="puzzle-hole-corner right-corner" :class="incorrectStyle"></div>
+			<svg class="puzzle-hole" :class="incorrectStyle" height="32" width="100">
+				<path d="m 20 32 C 25 32 30 27 30 22 V 14 C 30 7 35 4 40 4 H 60 C 65 4 70 9 70 14 V 22 C 70 27 75 32 80 32 L 100 32 L 100 0 L 0 0 L 0 32 z" />
+			</svg>
 		</div>
 	</div>
 </template>
@@ -32,7 +32,6 @@
 		font-size: 70px;
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
-		box-shadow: 2px 2px 2px #0004;
 		user-select: none;
 		transition: background-color 0.5s;
 	}
@@ -46,44 +45,13 @@
 		transform: translateX(-50%);
 	}
 	.puzzle-hole-container {
-		display: flex;
-	}
-	.puzzle-hole-corner {
 		height: 30px;
-		width: 30px;
-		background-color: #a6d189;
-		border-bottom-left-radius: 10px;
-		border-bottom-right-radius: 10px;
-		box-shadow: 2px 2px 2px #0004;
-		z-index: 1;
-		transition: background-color 0.5s;
-	}
-	.puzzle-hole-corner.incorrect {
-		background-color: #e78284;
-	}
-	.left-corner {
-		border-bottom-left-radius: 0px;
-	}
-	.right-corner {
-		border-bottom-right-radius: 0px;
 	}
 	.puzzle-hole {
-		position: relative;
-		height: 30px;
-		width: 40px;
+		translate: 0px -2px;
+		fill: #a6d189;
 	}
-	.puzzle-hole::after {
-		position: absolute;
-		content: "";
-		height: 100%;
-		width: 100%;
-		border-top-left-radius: 10px;
-		border-top-right-radius: 10px;
-		z-index: 2;
-		box-shadow: 0px -10px 0px #a6d189;
-		transition: box-shadow 0.5s;
-	}
-	.puzzle-hole.incorrect::after {
-		box-shadow: 0px -10px 0px #e78284;
+	.puzzle-hole.incorrect {
+		fill: #e78284;
 	}
 </style>
