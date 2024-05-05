@@ -4,7 +4,10 @@
 			<div class="button-container">
 				<div>
 					<button class="submit-button" :class="continueStyle" @click.prevent="emit('onSubmit')">
-						{{ submitButtonText }}
+						<Transition name="check-button" mode="out-in">
+							<span v-if="state.readyToGoToNextKanjiBatch">Continue</span>
+							<span v-else>Check</span>
+						</Transition>
 					</button>
 				</div>
 			</div>
@@ -129,5 +132,17 @@
 	}
 	.submit-button.continue:hover {
 		background-color: #c6f1a9;
+	}
+	.check-button-enter-from {
+		opacity: 0;
+		transform: translateY(-30px);
+	}
+	.check-button-leave-to {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	.check-button-enter-active,
+	.check-button-leave-active {
+		transition: all 0.5s ease;
 	}
 </style>
