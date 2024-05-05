@@ -40,7 +40,10 @@ export const useKanjiState = defineStore('kanji-state', () => {
 			if(modelData.meanings.find(m => m == newMeaning)) return
 
 			const char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-			if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
+			if(!char) {
+				console.error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
+				return
+			}
 
 			char.attachedMeaning = ""
 			modelData.meanings.push(newMeaning)
@@ -49,14 +52,20 @@ export const useKanjiState = defineStore('kanji-state', () => {
 
 		if(comingFromCharacter && oldMeaning) {
 			const char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-			if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
+			if(!char) {
+				console.error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
+				return
+			}
 
 			char.attachedMeaning = oldMeaning
 		} else if(!comingFromCharacter && oldMeaning) {
 			modelData.meanings.push(oldMeaning)
 		} else if(comingFromCharacter && !oldMeaning) {
 			const char = modelData.characters.find(c => c.kanji == comingFromCharacter)
-			if(!char) throw new Error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
+			if(!char) {
+				console.error(`Meaning coming from ${comingFromCharacter} but unable to find it in list.`)
+				return
+			}
 
 			char.attachedMeaning = ""
 		}
