@@ -18,9 +18,14 @@ export const useKanjiState = defineStore('kanji-state', () => {
 		readyToGoToNextKanjiBatch.value = inValue
 	}
 
-	function setModelData(inMeanings: string[], inCharacters: CharacterInfo[]) {
-		modelData.meanings = inMeanings
-		modelData.characters = inCharacters
+	function setModelData(inMeanings: string[], inCharacters: CharacterInfo[], stagger: boolean) {
+		if(stagger) {
+			setTimeout(() => modelData.characters = inCharacters, 1000)
+			setTimeout(() => modelData.meanings = inMeanings, 1500)
+		} else {
+			modelData.meanings = inMeanings
+			modelData.characters = inCharacters
+		}
 	}
 	function setModelDataMeanings(inMeanings: string[]) {
 		modelData.meanings = inMeanings

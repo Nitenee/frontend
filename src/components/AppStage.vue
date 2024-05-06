@@ -202,7 +202,7 @@
 				incorrect: null
 			})
 		}
-		state.setModelData(shuffleArray(meanings), shuffleArray(characters))
+		state.setModelData(shuffleArray(meanings), shuffleArray(characters), true)
 	}
 </script>
 

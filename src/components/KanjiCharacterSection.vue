@@ -39,7 +39,7 @@
 			ease: "power4.out",
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			delay: Number(el.dataset.index!) * 0.1 + 1,
+			delay: Number(el.dataset.index!) * 0.1,
 			onComplete: done
 		})
 	}
