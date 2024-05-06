@@ -65,7 +65,7 @@
 		flex-grow: 1;
 		box-shadow: inset 0px 0px 2px 2px #0007;
 		background-color: #303446;
-		background-image: url('@/assets/images/hexbg.webp');
+		background-image: url('@/assets/images/hexbgtransparent.webp');
 		animation: backgroundpanner 10s linear infinite;
 	}
 	@keyframes backgroundpanner {
