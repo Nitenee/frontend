@@ -65,15 +65,20 @@
 		user-select: none;
 		filter: drop-shadow(2px 2px 2px #0004);
 	}
-	.kanji:hover > div {
-		scale: 1.2;
-		border: 5px solid #ca9ee6;
-		background-color: #626880;
-		box-shadow: 0px 0px 2px 0px #000a;
-	}
 	.kanji.attached > div {
 		padding: 0;
 		margin: 5px;
+		box-shadow: 0px 0px 10px #737994;
+		border: 5px solid #232634;
+		background-color: #232634;
+	}
+	.kanji:hover > div {
+		scale: 1.2;
+	}
+	.kanji:not(.attached):hover > div {
+		background-color: #626880;
+		border: 5px solid #949cbb;
+		box-shadow: 0px 0px 2px 0px #000a;
 	}
 	.meaning-drop-zone {
 		margin-top: -32px;
@@ -84,4 +89,8 @@
 	.meaning-drop-zone.attached {
 		height: fit-content;
 	}
+	.kanji:hover .puzzle-knob-inner-connected {
+		fill: red;
+}
+
 </style>
