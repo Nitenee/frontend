@@ -8,7 +8,7 @@
 			<div>
 				<div class="puzzle-knob-container">
 					<svg class="puzzle-knob" height="32" width="100">
-						<path d="m 20 30 C 25 30 30 25 30 20 V 12 C 30 7 35 2 40 2 H 60 C 65 2 70 7 70 12 V 20 C 70 25 75 30 80 30 L 100 30 L 100 32 L 0 32 L 0 30 z" />
+						<path d="m 18 30 C 24 30 29 25 29 20 V 12 C 29 7 34 2 39 2 H 61 C 66 2 71 7 71 12 V 20 C 71 25 76 30 81 30 L 100 30 L 100 32 L 0 32 L 0 30 z" />
 					</svg>
 				</div>
 				<div class="meaning" lang="en">
