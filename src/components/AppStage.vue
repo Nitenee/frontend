@@ -60,7 +60,17 @@
 	})
 
 	function unsetDragging() {
-		dragAndDrop.clearDragging()
+		if(dragAndDrop.isDragging) {
+			if(dragAndDrop.draggingAttachedCharacter && dragAndDrop.draggingMeaning) {
+				state.processDrop({
+							goingToCharacter: "MEANINGZONE",
+							comingFromCharacter: dragAndDrop.draggingAttachedCharacter,
+							oldMeaning: "MEANINGZONE",
+							newMeaning: dragAndDrop.draggingMeaning
+						})
+			}
+			dragAndDrop.clearDragging()
+		}
 	}
 
 	function onPointerMove(e: PointerEvent) {
