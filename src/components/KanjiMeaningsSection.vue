@@ -13,20 +13,22 @@
 			</div>
 		</div>
 		<div class="kanji-meaning-items-container">
-			<TransitionGroup 
-				tag="div" 
-				name="meaning" 
-				@enter="onEnter"
-			>
+			<div>
 				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
-				<KanjiMeaning 
-					v-for="(meaning, index) in state.modelData.meanings" 
-					:key="meaning" 
-					:data-index="index"
-					:meaning="meaning" 
-					:attachedCharacter="''"
-				/>
-			</TransitionGroup>
+				<TransitionGroup 
+					tag="div" 
+					name="meaning" 
+					@enter="onEnter"
+				>
+					<KanjiMeaning 
+						v-for="(meaning, index) in state.modelData.meanings" 
+						:key="meaning" 
+						:data-index="index"
+						:meaning="meaning" 
+						:attachedCharacter="''"
+					/>
+				</TransitionGroup>
+			</div>
 		</div>
 	</section>
 </template>
@@ -39,9 +41,6 @@
 	import { useKanjiState } from '@/stores/kanjistate'
 
 	const state = useKanjiState()
-	const submitButtonText = computed(() => {
-		return state.readyToGoToNextKanjiBatch ? "Continue" : "Check" 
-	})
 	const continueStyle = computed(() => {
 		return state.readyToGoToNextKanjiBatch ? "continue" : ""
 	})
