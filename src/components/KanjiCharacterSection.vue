@@ -90,11 +90,11 @@
 		position: relative;
 		display: flex;
 		flex-wrap: wrap;
-		align-content: center;
+		/* Fallback for Safari which doesn't support 'safe' */
+		align-content: flex-start;
+		align-content: safe center;
 		justify-content: space-evenly;
-		gap: 20px;
-		padding: 20px;
-		height: 100dvh;
+		height: calc(100dvh - 64px);
 		overflow-y: auto;
 		scrollbar-gutter: stable both-edges;
 		scrollbar-color: #838ba7 #626880;
