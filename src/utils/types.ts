@@ -12,14 +12,16 @@ export interface KanjiBatchRequest {
 }
 
 export interface ServerKanji {
-	[key: string]: {
-		character: string;
-		level: number;
-		document_url: string;
-		meaning: string;
-		readings: string;
-		visually_similar_subject_ids: number[];
-	}
+	[key: string]: Kanji
+}
+
+export interface Kanji {
+	character: string;
+	level: number;
+	document_url: string;
+	meaning: string;
+	readings: string;
+	visually_similar_subject_ids: number[];
 }
 
 export interface NDropEvent {
@@ -27,4 +29,11 @@ export interface NDropEvent {
 	comingFromCharacter: string;
 	oldMeaning: string;
 	newMeaning: string;
+}
+
+export interface CharacterInfo {
+	kanji: string;
+	correctMeaning: string; 
+	attachedMeaning: string;
+	incorrect: boolean | null;
 }

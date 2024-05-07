@@ -1,13 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
-import { NDropEvent } from '@/utils/types'
+import { CharacterInfo, NDropEvent } from '@/utils/types'
 
-interface CharacterInfo {
-	kanji: string;
-	correctMeaning: string; 
-	attachedMeaning: string;
-	incorrect: boolean | null;
-}
 
 export const useKanjiState = defineStore('kanji-state', () => {
 	const modelData = reactive({ meanings: [] as string[], characters: [] as CharacterInfo[] })

@@ -29,7 +29,7 @@
 	import { useDragAndDrop } from '@/stores/draganddrop'
 	import { useKanjiState } from '@/stores/kanjistate'
 	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
-	import { ServerKanji, KanjiBatchRequest } from '@/utils/types'
+	import { Kanji, ServerKanji, CharacterInfo, KanjiBatchRequest } from '@/utils/types'
 
 	import NavBar from '@/components/NavBar.vue'
 	import PopOver from '@/components/PopOver.vue'
@@ -130,6 +130,8 @@
 		// @ts-ignore
 		popover.value.popover.classList.add('show')
 		if(animate) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			popover.value.popover.classList.add('animate')
 		}
 	}
@@ -142,6 +144,8 @@
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		popover.value.popover.classList.remove('show')
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		popover.value.popover.classList.remove('animate')
 	}
 
@@ -201,37 +205,36 @@
 	}
 
 	function updateKanji(newKanji: ServerKanji) {
-		const meanings = []
-		const characters = []
+		const meanings = [] as string[]
+		const characters = [] as CharacterInfo[]
+
 		if(settings.groupKanji) {
-			const allKanji = Array.from(Object.entries(newKanji))
-			const kanjiList = []
-			const seen = new Set()
-			console.log(`Existing kanji`, newKanji)
+			let allKanji = shuffleArray(Object.entries(newKanji)) //Shuffle here so it's not always the same order of kanji
+			let seen = new Set()
+			let groupedKanji = [] as Kanji[]
+
 			allKanji.forEach(kanji => {
-				console.log(`checking to see if we've seen ${kanji[0]}. ${seen.has(kanji[0])}`, seen)
-				if(!seen.has(kanji[0])) {
-					let group = []
-					seen.add(parseInt(kanji[0]))
-					group.push(kanji[1])
-					kanji[1].visually_similar_subject_ids.forEach(vssid => {
-						console.log(`checking to see if ${kanji[0]}'s visually similar ${vssid} has been seen. does ${vssid} exist? ${!!newKanji[vssid]}`, seen.has(vssid), seen)
+				let kanjiId = parseInt(kanji[0])
+				if(!seen.has(kanjiId)) {
+					seen.add(kanjiId)
+					let group = [] as Kanji[]
+					let kanjiInfo = kanji[1]
+					group.push(kanjiInfo) 
+
+					kanjiInfo.visually_similar_subject_ids.forEach((vssid: number) => {
 						if(!seen.has(vssid)) {
 							seen.add(vssid)
-							if(newKanji[vssid]) {
-								group.push(newKanji[vssid])
-							} 
+							if(!newKanji[vssid]) return
+							group.push(newKanji[vssid])
 						}
 					})
-					kanjiList.push(...group)
-				}
-			})
-			console.log(kanjiList)
-			kanjiList.forEach(k => {
-				meanings.push(k.meaning)
+					groupedKanji.push(...group)
+				}			})
+			groupedKanji.forEach(kanji => {
+				meanings.push(kanji.meaning)
 				characters.push({
-					kanji: k.character,
-					correctMeaning: k.meaning,
+					kanji: kanji.character,
+					correctMeaning: kanji.meaning,
 					attachedMeaning: "",
 					incorrect: null
 				})
