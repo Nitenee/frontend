@@ -201,18 +201,54 @@
 	}
 
 	function updateKanji(newKanji: ServerKanji) {
-		let meanings = []
-		let characters = []
-		for(const kanji of Object.values(newKanji)) {
-			meanings.push(kanji.meaning)
-			characters.push({
-				kanji: kanji.character,
-				correctMeaning: kanji.meaning,
-				attachedMeaning: "",
-				incorrect: null
+		const meanings = []
+		const characters = []
+		if(settings.groupKanji) {
+			const allKanji = Array.from(Object.entries(newKanji))
+			const kanjiList = []
+			const seen = new Set()
+			console.log(`Existing kanji`, newKanji)
+			allKanji.forEach(kanji => {
+				console.log(`checking to see if we've seen ${kanji[0]}. ${seen.has(kanji[0])}`, seen)
+				if(!seen.has(kanji[0])) {
+					let group = []
+					seen.add(parseInt(kanji[0]))
+					group.push(kanji[1])
+					kanji[1].visually_similar_subject_ids.forEach(vssid => {
+						console.log(`checking to see if ${kanji[0]}'s visually similar ${vssid} has been seen. does ${vssid} exist? ${!!newKanji[vssid]}`, seen.has(vssid), seen)
+						if(!seen.has(vssid)) {
+							seen.add(vssid)
+							if(newKanji[vssid]) {
+								group.push(newKanji[vssid])
+							} 
+						}
+					})
+					kanjiList.push(...group)
+				}
 			})
+			console.log(kanjiList)
+			kanjiList.forEach(k => {
+				meanings.push(k.meaning)
+				characters.push({
+					kanji: k.character,
+					correctMeaning: k.meaning,
+					attachedMeaning: "",
+					incorrect: null
+				})
+			})
+			state.setModelData(shuffleArray(meanings), characters, true)
+		} else {
+			for(const kanji of Object.values(newKanji)) {
+				meanings.push(kanji.meaning)
+				characters.push({
+					kanji: kanji.character,
+					correctMeaning: kanji.meaning,
+					attachedMeaning: "",
+					incorrect: null
+				})
+			}
+			state.setModelData(shuffleArray(meanings), shuffleArray(characters), true)
 		}
-		state.setModelData(shuffleArray(meanings), shuffleArray(characters), true)
 	}
 </script>
 

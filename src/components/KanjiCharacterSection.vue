@@ -1,5 +1,7 @@
 <template>
 	<section class="kanji-characters-container">
+		<div class="background-layer"></div>
+		<div class="background-layer-shadow"></div>
 		<RoundedCorners :hideBottomLeft="true" />
 			<TransitionGroup 
 				tag="div"
@@ -63,14 +65,26 @@
 		width: calc(100vw - 500px);
 		min-width: 200px;
 		flex-grow: 1;
-		box-shadow: inset 0px 0px 2px 2px #0007;
 		background-color: #303446;
+		overflow: hidden;
+	}
+	.background-layer {
+		position: absolute;
+		width: 200%;
+		height: 200%;
 		background-image: url('@/assets/images/hexbgtransparent.webp');
 		animation: backgroundpanner 10s linear infinite;
+		transform: translate(-50% -50%);
+	}
+	.background-layer-shadow {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		box-shadow: inset 0px 0px 2px 2px #0007;
 	}
 	@keyframes backgroundpanner {
-		0% { background-position: 0px 0px; }
-		100% { background-position: 60px 52px; }
+		0% { translate: -50% -50%; }
+		100% { translate: calc(-50% + 60px) calc(-50% + 52px); }
 	}
 	.kanji-characters {
 		position: relative;
