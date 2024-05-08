@@ -115,6 +115,7 @@
 		height: 50px;
 		text-align: center;
 		border-radius: 5px;
+		user-select: none;
 		font-size: 20px;
 		background-color: #babbf1;
 		box-shadow: 2px 2px 2px #0004;
