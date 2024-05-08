@@ -98,17 +98,10 @@
 	.shine {
 		position: absolute;
 		width: 100px;
-		translate: 0 -70%;
+		translate: 0 -80%;
 		height: 200%;
 		rotate: 45deg;
 		background-image: linear-gradient(to right, transparent, #fff7, transparent);
 		z-index: 10;
-	}
-	.shine.play {
-		animation: shineanim 0.1s linear forwards;
-	}
-	@keyframes shineanim {
-		0%   { translate: 0 -70% }
-		100% { translate: 0 25% }
 	}
 </style>
