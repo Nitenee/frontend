@@ -57,7 +57,7 @@
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			delay: Number(el.dataset.index!) * 0.1,
-			onComplete: done
+				onComplete: () => { el.setAttribute('style', ''); done() }
 		})
 	}
 
@@ -143,5 +143,19 @@
 	.check-button-enter-active,
 	.check-button-leave-active {
 		transition: all 0.5s ease;
+	}
+	.meaning-move	{
+		transition: all 0.5s ease;
+	}
+	.meaning-leave-active {
+		transition: opacity 0.5s ease, scale 0.5s ease;
+	}
+	.meaning-leave-active {
+		position: absolute;
+		translate: -50px 0px;
+	}
+	.meaning-leave-to {
+		opacity: 0;
+		scale: 0;
 	}
 </style>

@@ -23,6 +23,7 @@
 </template>
 
 <script setup lang='ts'>
+	import { onMounted } from 'vue'
 	import gsap from 'gsap'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
@@ -93,6 +94,8 @@
 		/* Fallback for Safari which doesn't support 'safe' */
 		align-content: flex-start;
 		align-content: safe center;
+		padding: 20px;
+		gap: 25px;
 		justify-content: space-evenly;
 		height: calc(100dvh - 64px);
 		overflow-y: auto;

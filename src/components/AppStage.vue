@@ -30,6 +30,7 @@
 	import { useKanjiState } from '@/stores/kanjistate'
 	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
 	import { Kanji, ServerKanji, CharacterInfo, KanjiBatchRequest } from '@/utils/types'
+	import gsap from 'gsap'
 
 	import NavBar from '@/components/NavBar.vue'
 	import PopOver from '@/components/PopOver.vue'
@@ -47,6 +48,7 @@
 
 	let wanikaniLevel = ref<number | null>(null)
 	let wanikaniUsername = ref("")
+	const playAllCorrectWaveAnimation = ref<(() => void) | null>(null)
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
@@ -103,17 +105,41 @@
 		})
 
 		if(allAnswersCorrect && settings.autoContinue) {
+			document.querySelectorAll('.kanji').forEach(el => { 
+				(el as HTMLElement).style.pointerEvents = 'none'
+			})
 			setTimeout(() => {
-				getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
-			}, 250)
+				gsap.to('.shine', {
+					duration: 0.2,
+					translateY: '25%',
+					stagger: 0.05,
+					onComplete: () => {
+						setTimeout(() => {
+							getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
+						}, 250)
+					}
+				})
+			}, 500)
 		} else if(allAnswersCorrect) {
-			popoverShow("グッドジョブ！", "Looking good!", true)
+			document.querySelectorAll('.kanji').forEach(el => { 
+				(el as HTMLElement).style.pointerEvents = 'none'
+			})
 			setTimeout(() => {
-				state.setReadyToGoToNextKanjiBatch(true)
-				setTimeout(() => {
-					popoverHide()
-				}, 1000)
-			}, 1000)
+				gsap.to('.shine', {
+					duration: 0.1,
+					translateY: '25%',
+					stagger: 0.025,
+					onComplete: () => {
+						popoverShow("グッドジョブ！", "Looking good!", true)
+						setTimeout(() => {
+							state.setReadyToGoToNextKanjiBatch(true)
+							setTimeout(() => {
+								popoverHide()
+							}, 1000)
+						}, 1000)
+					}
+				})
+			}, 250)
 		}
 	}
 
@@ -138,6 +164,7 @@
 
 	function popoverHide() {
 		if(!popover.value || !popover.value.popover) throw new Error ("popover ref is null")
+		// TypeScript weirding out about this syntax
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		popover.value.popover.style.pointerEvents = 'none'

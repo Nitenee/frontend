@@ -5,6 +5,7 @@
 		:class="attachedMeaning ? 'attached' : ''"
 	>
 		<div>
+			<div class="shine"></div>
 			<KanjiCharacter :character="kanji" :incorrect="incorrect" />
 			<div 
 				class="meaning-drop-zone"
@@ -55,6 +56,7 @@
 
 <style scoped>
 	.kanji > div {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		background-color: #414559;
@@ -64,6 +66,7 @@
 		transition: all 0.15s ease;
 		user-select: none;
 		filter: drop-shadow(2px 2px 2px #0004);
+		overflow: hidden;
 	}
 	.kanji.attached > div {
 		padding: 0;
@@ -91,6 +94,21 @@
 	}
 	.kanji:hover .puzzle-knob-inner-connected {
 		fill: red;
-}
-
+	}
+	.shine {
+		position: absolute;
+		width: 100px;
+		translate: 0 -70%;
+		height: 200%;
+		rotate: 45deg;
+		background-image: linear-gradient(to right, transparent, #fff7, transparent);
+		z-index: 10;
+	}
+	.shine.play {
+		animation: shineanim 0.1s linear forwards;
+	}
+	@keyframes shineanim {
+		0%   { translate: 0 -70% }
+		100% { translate: 0 25% }
+	}
 </style>

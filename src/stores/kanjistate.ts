@@ -7,6 +7,7 @@ export const useKanjiState = defineStore('kanji-state', () => {
 	const modelData = reactive({ meanings: [] as string[], characters: [] as CharacterInfo[] })
 	const readyToGoToNextKanjiBatch = ref(false)
 	const checkAnswers = ref<(() => void) | null>(null)
+	const allCorrectWaveAnimation = ref<(() => void) | null>(null)
 
 	function setReadyToGoToNextKanjiBatch(inValue: boolean) {
 		readyToGoToNextKanjiBatch.value = inValue
@@ -82,6 +83,9 @@ export const useKanjiState = defineStore('kanji-state', () => {
 	function setCheckAnswers(inFunction: () => void) {
 		checkAnswers.value = inFunction
 	}
+	function setAllCorrectWaveAnimation(inFunction: () => void) {
+		allCorrectWaveAnimation.value = inFunction
+	}
 
 	return {
 		modelData,
@@ -93,6 +97,7 @@ export const useKanjiState = defineStore('kanji-state', () => {
 		clearModelData,
 		setReadyToGoToNextKanjiBatch,
 		setCheckAnswers,
+		setAllCorrectWaveAnimation,
 		
 		processDrop
 	}
