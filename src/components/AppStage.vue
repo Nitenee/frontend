@@ -235,7 +235,7 @@
 		const meanings = [] as string[]
 		const characters = [] as CharacterInfo[]
 
-		if(settings.groupKanji) {
+		if(settings.groupKanji && settings.batchSize > 1) {
 			let allKanji = shuffleArray(Object.entries(newKanji)) //Shuffle here so it's not always the same order of kanji
 			let seen = new Set()
 			let groupedKanji = [] as Kanji[]
