@@ -2,7 +2,7 @@
 	<section class="kanji-characters-container">
 		<div class="background-layer"></div>
 		<div class="background-layer-shadow"></div>
-		<RoundedCorners :hideBottomLeft="true" />
+		<RoundedCorners :hideBottomLeft="true" :hideTopRight="true" :hideBottomRight="true" />
 			<TransitionGroup 
 				tag="div"
 				class="kanji-characters"
@@ -68,6 +68,8 @@
 		flex-grow: 1;
 		background-color: #303446;
 		overflow: hidden;
+		border-top-right-radius: 20px;
+		border-bottom-right-radius: 20px;
 	}
 	.background-layer {
 		position: absolute;
@@ -82,6 +84,8 @@
 		width: 100%;
 		height: 100%;
 		box-shadow: inset 0px 0px 2px 2px #0007;
+		border-top-right-radius: 20px;
+		border-bottom-right-radius: 20px;
 	}
 	@keyframes backgroundpanner {
 		0% { translate: -50% -50%; }
