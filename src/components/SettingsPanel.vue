@@ -1,72 +1,74 @@
 <template>
 	<section>
 		<div class="settings-panel-container">
-			<div class="settings-panel">
-				<div class="panel-title">
-					設定
-				</div>
-				<div class="option-container">
-					<div class="option-title">
-						Answer Checking
+			<div class="scrollbar-rounder">
+				<div class="settings-panel">
+					<div class="panel-title">
+						設定
 					</div>
-					<div class="option-content">
-						<div class="group-kanji">
-							<div class="flex-grow">Auto-Check</div>
-							<input type="checkbox" v-model="store.autoCheck" />
+					<div class="option-container">
+						<div class="option-title">
+							Answer Checking
 						</div>
-						<div class="group-kanji">
-							<div class="flex-grow">Auto-Continue</div>
-							<input type="checkbox" v-model="store.autoContinue" />
-						</div>
-					</div>
-				</div>
-				<div class="option-container">
-					<div class="option-title">
-						Grouping
-					</div>
-					<div class="option-content">
-						<div class="batch-size">
-							<div class="flex-grow">Number of Groups</div>
-							<input type="number" @blur="checkLimits('batch')" v-model="store.batchSize"/>
-						</div>
-						<div class="group-kanji">
-							<div class="flex-grow">Keep Groups Together</div>
-							<input type="checkbox" v-model="store.groupKanji" />
+						<div class="option-content">
+							<div class="group-kanji">
+								<div class="flex-grow">Auto-Check</div>
+								<input type="checkbox" v-model="store.autoCheck" />
+							</div>
+							<div class="group-kanji">
+								<div class="flex-grow">Auto-Continue</div>
+								<input type="checkbox" v-model="store.autoContinue" />
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="option-container">
-					<div class="option-title">Level Limits</div>
-					<div class="option-content">
-						<div class="level-limit">
-							<div class="flex-grow" :class="upperLimitDisabled">Upper Limit</div>
-							<input type="number" @blur="checkLimits('upper')" v-model="store.levelLimitUpper" :disabled="store.useWanikaniLevel" />
+					<div class="option-container">
+						<div class="option-title">
+							Grouping
 						</div>
-						<div class="level-limit">
-							<div class="flex-grow">Lower Limit</div>
-							<input type="number" @blur="checkLimits('lower')" v-model="store.levelLimitLower" />
-						</div>
-						<div class="level-limit">
-							<div class="flex-grow">Use WaniKani Level</div>
-							<input type="checkbox" v-model="store.useWanikaniLevel" />
+						<div class="option-content">
+							<div class="batch-size">
+								<div class="flex-grow">Number of Groups</div>
+								<input type="number" @blur="checkLimits('batch')" v-model="store.batchSize"/>
+							</div>
+							<div class="group-kanji">
+								<div class="flex-grow">Keep Groups Together</div>
+								<input type="checkbox" v-model="store.groupKanji" />
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="option-container">
-					<div class="option-title">
-						WaniKani
-					</div>
-					<div class="option-content">
-						<div class="wanikani">
-							<div>API Key</div>
-							<input type="password" v-model="store.wanikaniAPIKey" placeholder="API Key Goes Here" />
+					<div class="option-container">
+						<div class="option-title">Level Limits</div>
+						<div class="option-content">
+							<div class="level-limit">
+								<div class="flex-grow" :class="upperLimitDisabled">Upper Limit</div>
+								<input type="number" @blur="checkLimits('upper')" v-model="store.levelLimitUpper" :disabled="store.useWanikaniLevel" />
+							</div>
+							<div class="level-limit">
+								<div class="flex-grow">Lower Limit</div>
+								<input type="number" @blur="checkLimits('lower')" v-model="store.levelLimitLower" />
+							</div>
+							<div class="level-limit">
+								<div class="flex-grow">Use WaniKani Level</div>
+								<input type="checkbox" v-model="store.useWanikaniLevel" />
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="save-button-container">
-					<button class="save-button" @click="updateValues">
-						Save
-					</button>
+					<div class="option-container">
+						<div class="option-title">
+							WaniKani
+						</div>
+						<div class="option-content">
+							<div class="wanikani">
+								<div>API Key</div>
+								<input type="password" v-model="store.wanikaniAPIKey" placeholder="API Key Goes Here" />
+							</div>
+						</div>
+					</div>
+					<div class="save-button-container">
+						<button class="save-button" @click="updateValues">
+							Save
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -164,15 +166,22 @@
 		translate: -1px -1px;
 		box-shadow: 4px 4px 8px #0007;
 	}
+	.scrollbar-rounder {
+		overflow: hidden;
+		height: 100%;
+		border-radius: 10px;
+	}
 	.settings-panel {
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
 		height: 100%;
 		background-color: #737994;
-		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
 		padding: 10px;
+		scrollbar-color: #838ba7 #626880;
+		scrollbar-width: thin;
+		overflow-y: auto;
 	}
 	.panel-title {
 		display: flex;
@@ -232,7 +241,8 @@
 		cursor: text;
 	}
 	input[type=number] {
-			-moz-appearance:textfield;
+		-moz-appearance:textfield;
+		appearance: textfield;
 	}
 	input::-webkit-outer-spin-button,
 	input::-webkit-inner-spin-button {
