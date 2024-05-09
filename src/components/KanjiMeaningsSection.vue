@@ -17,6 +17,7 @@
 				<RoundedCorners :hideBottomRight=true :hideTopRight="true" />
 				<TransitionGroup 
 					tag="div" 
+					class="meanings"
 					name="meaning" 
 					@enter="onEnter"
 				>
@@ -79,10 +80,14 @@
 		position: relative;
 		direction: rtl;
 		height: 100%;
+	}
+	.meanings {
+		height: 100%;
 		padding-top: 20px;
 		overflow-y: auto;
 		scrollbar-color: #838ba7 #626880;
 		scrollbar-width: thin;
+		scrollbar-gutter: stable both-edges;
 	}
 	.button-container {
 		position: relative;
