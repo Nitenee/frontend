@@ -5,6 +5,7 @@ import { CharacterInfo, NDropEvent } from '@/utils/types'
 
 export const useKanjiState = defineStore('kanji-state', () => {
 	const modelData = reactive({ meanings: [] as string[], characters: [] as CharacterInfo[] })
+	const hasSelectedSettings = ref(false)
 	const readyToGoToNextKanjiBatch = ref(false)
 	const checkAnswers = ref<(() => void) | null>(null)
 	const allCorrectWaveAnimation = ref<(() => void) | null>(null)
@@ -27,6 +28,9 @@ export const useKanjiState = defineStore('kanji-state', () => {
 	}
 	function setModelDataCharacters(inCharacters: CharacterInfo[]) {
 		modelData.characters = inCharacters
+	}
+	function setHasSelectedSettings(inHasSelectedSettings: boolean) {
+		hasSelectedSettings.value = inHasSelectedSettings
 	}
 	function clearModelData() {
 		modelData.meanings = [] as string[]
@@ -90,10 +94,12 @@ export const useKanjiState = defineStore('kanji-state', () => {
 	return {
 		modelData,
 		readyToGoToNextKanjiBatch,
+		hasSelectedSettings,
 
 		setModelData,
 		setModelDataMeanings,
 		setModelDataCharacters,
+		setHasSelectedSettings,
 		clearModelData,
 		setReadyToGoToNextKanjiBatch,
 		setCheckAnswers,

@@ -3,9 +3,14 @@
 		<div class="curve">
 			<div class="button-container">
 				<div>
-					<button class="submit-button" :class="continueStyle" @click.prevent="emit('onSubmit')">
+					<button class="submit-button"
+						:class="continueStyle"
+						:disabled="!state.hasSelectedSettings"
+						@click.prevent="emit('onSubmit')"
+					>
 						<Transition name="check-button" mode="out-in">
-							<span v-if="state.readyToGoToNextKanjiBatch">Continue</span>
+							<span v-if="!state.hasSelectedSettings">Disabled</span>
+							<span v-else-if="state.readyToGoToNextKanjiBatch">Continue</span>
 							<span v-else>Check</span>
 						</Transition>
 					</button>
@@ -126,7 +131,11 @@
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s, background-color 0.3s;
 	}
-	.submit-button:hover {
+	.submit-button:disabled {
+		background-color: #838ba7;
+		color: #51576d;
+	}
+	.submit-button:not(:disabled):hover {
 		cursor: pointer;
 		background-color: #cacbff;
 		box-shadow: 4px 4px 8px #0004;
@@ -135,7 +144,7 @@
 	.continue {
 		background-color: #a6d189;
 	}
-	.submit-button.continue:hover {
+	.submit-button.continue:not(:disabled):hover {
 		background-color: #c6f1a9;
 	}
 	.check-button-enter-from {

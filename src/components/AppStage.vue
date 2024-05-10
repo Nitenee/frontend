@@ -195,11 +195,12 @@
 			wanikaniRequest(settings.wanikaniAPIKey).then(userData => {
 				wanikaniLevel.value = userData.data.level
 				wanikaniUsername.value = userData.data.username
+				state.setHasSelectedSettings(true)
 				toggleSettings()
 				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 			})
-
 		} else {
+			state.setHasSelectedSettings(true)
 			toggleSettings()
 			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 		}
