@@ -28,7 +28,7 @@
 		display: flex;
 		width: 100px;
 		height: 100px;
-		background-color: #a6d189;
+		background-color: var(--color-green);
 		font-size: 70px;
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
@@ -36,7 +36,7 @@
 		transition: background-color 0.5s;
 	}
 	.character.incorrect {
-		background-color: #e78284;
+		background-color: var(--color-red);
 	}
 	span {
 		position: absolute;
@@ -49,10 +49,10 @@
 	}
 	.puzzle-hole {
 		translate: 0px -2px;
-		fill: #a6d189;
+		fill: var(--color-green);
 		transition: fill 0.5s;
 	}
 	.puzzle-hole.incorrect {
-		fill: #e78284;
+		fill: var(--color-red);
 	}
 </style>

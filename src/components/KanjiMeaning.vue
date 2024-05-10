@@ -85,7 +85,7 @@
 		display: flex;
 		justify-content: center;
 		width: 100px;
-		background-color: #81c8be;
+		background-color: var(--color-teal);
 		font-size: 15px;
 		border-bottom-left-radius: 10px;
 		border-bottom-right-radius: 10px;
@@ -93,7 +93,7 @@
 		box-shadow: 2px 2px 2px #0004;
 		transition: all 0.3s ease;
 		word-wrap: break-word;
-		border: 5px solid #232634;
+		border: 5px solid var(--color-crust);
 		border-top: none;
 	}
 	.container:hover .meaning {
@@ -116,18 +116,18 @@
 		z-index: 2;
 	}
 	.puzzle-knob-stroker {
-		fill: #232634;
+		fill: var(--color-crust);
 		filter: drop-shadow(4px 4px 4px #0004);
 	}
 	.puzzle-knob-separator {
-		fill: #232634;
+		fill: var(--color-crust);
 		translate: 0px -7px;
 	}
 	.container.attached .puzzle-knob-stroker {
 		display: none;
 	}
 	.puzzle-knob-inner {
-		fill: #81c8be;
+		fill: var(--color-teal);
 		translate: 0px 5px;
 	}
 	.container.attached .meaning {

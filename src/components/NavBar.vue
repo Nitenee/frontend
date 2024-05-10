@@ -35,8 +35,8 @@
 		font-family: 'MikanNoki';
 		font-size: 50px;
 		font-weight: bold;
-		color: #c6d0f5;
-		-webkit-text-stroke: 1.5pt #303446;
+		color: var(--color-text);
+		-webkit-text-stroke: 1.5pt var(--color-base);
 		text-shadow: 2px 2px 2px #0007;
 		letter-spacing: -10px;
 		transition: translate 0.3s, text-shadow 0.3s;
@@ -59,7 +59,7 @@
 		padding: 5px 10px;
 		align-items: center;
 		justify-content: center;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s;
@@ -78,18 +78,18 @@
 		height: 35px;
 		border-radius: 5px;
 		font-size: 20px;
-		background-color: #737994;
+		background-color: var(--color-overlay0);
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s;
 	}
 	.settings-button:hover {
 		translate: -2px -2px;
 		box-shadow: 4px 4px 8px #0004;
-		background-color: #838ba7;
+		background-color: var(--color-overlay1);
 		cursor: pointer;
 	}
 	.settings-button svg {
-		fill: #c6d0f5;
+		fill: var(--color-text);
 		transition: rotate 0.3s, fill 0.3s;
 		filter: drop-shadow(1px 1px #0007);
 	}

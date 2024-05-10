@@ -59,10 +59,10 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		padding: 5px;
 		border-radius: 15px;
-		border: 5px solid #737994;
+		border: 5px solid var(--color-overlay0);
 		transition: all 0.15s ease;
 		user-select: none;
 		filter: drop-shadow(2px 2px 2px #0004);
@@ -71,16 +71,16 @@
 	.kanji.attached > div {
 		padding: 0;
 		margin: 5px;
-		box-shadow: 0px 0px 10px #737994;
-		border: 5px solid #232634;
-		background-color: #232634;
+		box-shadow: 0px 0px 10px var(--color-overlay0);
+		border: 5px solid var(--color-crust);
+		background-color: var(--color-crust);
 	}
 	.kanji:hover > div {
 		scale: 1.2;
 	}
 	.kanji:not(.attached):hover > div {
-		background-color: #626880;
-		border: 5px solid #949cbb;
+		background-color: var(--color-surface2);
+		border: 5px solid var(--color-overlay2);
 		box-shadow: 0px 0px 2px 0px #000a;
 	}
 	.meaning-drop-zone {

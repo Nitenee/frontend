@@ -2,6 +2,11 @@
 	<section class="kanji-characters-container">
 		<div class="background-layer"></div>
 		<div class="background-layer-shadow"></div>
+		<div class="click-save-message-container">
+			<div class="click-save-message">
+				<span>Choose your settings to get started.</span>
+			</div>
+		</div>
 		<RoundedCorners :hideBottomLeft="true" :hideTopRight="true" :hideBottomRight="true" />
 			<TransitionGroup 
 				tag="div"
@@ -66,7 +71,7 @@
 		width: calc(100vw - 500px);
 		min-width: 200px;
 		flex-grow: 1;
-		background-color: #303446;
+		background-color: var(--color-base);
 		overflow: hidden;
 		border-top-right-radius: 20px;
 		border-bottom-right-radius: 20px;
@@ -104,7 +109,10 @@
 		height: calc(100dvh - 64px);
 		overflow-y: auto;
 		scrollbar-gutter: stable both-edges;
-		scrollbar-color: #838ba7 #626880;
+		scrollbar-color: var(--color-overlay1) var(--color-surface2);
 		scrollbar-width: thin;
 	}
+	.click-save-message {
+		
+}
 </style>

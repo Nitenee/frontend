@@ -74,11 +74,11 @@
 	.kanji-meanings {
 		height: calc(100dvh - 64px);
 		min-width: 200px;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 	}
 	.kanji-meaning-items-container {
 		height: calc(100% - 110px);
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		box-shadow: inset 2px -2px 2px #0007;
 	}
 	.kanji-meaning-items-container > div {
@@ -90,7 +90,7 @@
 		height: 100%;
 		padding-top: 20px;
 		overflow-y: auto;
-		scrollbar-color: #838ba7 #626880;
+		scrollbar-color: var(--color-overlay1) var(--color-surface2);
 		scrollbar-width: thin;
 		scrollbar-gutter: stable both-edges;
 	}
@@ -98,7 +98,7 @@
 		position: relative;
 		padding-top: 10px;
 		padding-bottom: 20px;
-		background-color: #51576d;
+		background-color: var(--color-surface1);
 		border-bottom-right-radius: 15px;
 		box-shadow: 0px 3px 3px 0px #0007;
 	}
@@ -108,7 +108,7 @@
 		align-items: center;
 		width: 90%;
 		height: 80px;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s;
@@ -127,13 +127,13 @@
 		border-radius: 5px;
 		user-select: none;
 		font-size: 20px;
-		background-color: #babbf1;
+		background-color: var(--color-lavender);
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s, background-color 0.3s;
 	}
 	.submit-button:disabled {
-		background-color: #838ba7;
-		color: #51576d;
+		background-color: var(--color-overlay1);
+		color: var(--color-surface1);
 	}
 	.submit-button:not(:disabled):hover {
 		cursor: pointer;
@@ -142,7 +142,7 @@
 		translate: -2px -2px;
 	}
 	.continue {
-		background-color: #a6d189;
+		background-color: var(--color-green);
 	}
 	.submit-button.continue:not(:disabled):hover {
 		background-color: #c6f1a9;

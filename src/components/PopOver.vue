@@ -25,7 +25,7 @@
 		isolation: isolate;
 		width: 100%;
 		height: 100%;
-		color: #c6d0f5;
+		color: var(--color-text);
 		font-weight: bold;
 		display: grid;
 		grid-template-areas: 

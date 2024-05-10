@@ -14,13 +14,42 @@
 	}
 	html, body {
 		margin: 0;
-		background-color: #303446;
-		color: #232634;
+		background-color: var(--color-base);
+		color: var(--color-crust);
 		overflow: hidden;
 	}
 	main {
 		padding: 2px;
-		background-color: #51576d;
+		background-color: var(--color-surface1);
 		overflow: hidden;
+	}
+	/* Colors */
+	:root {
+		--color-rosewater:	#f2d5cf;
+		--color-flamingo:	#eebee;
+		--color-pink:	#f4b8e4;
+		--color-mauve:	#ca9ee6;
+		--color-red:	#e78284;
+		--color-maroon:	#ea999c;
+		--color-peach:	#ef9f76;
+		--color-yellow:	#e5c890;
+		--color-green:	#a6d189;
+		--color-teal:	#81c8be;
+		--color-sky:	#99d1db;
+		--color-sapphire:	#85c1dc;
+		--color-blue:	#8caaee;
+		--color-lavender:	#babbf1;
+		--color-text:	#c6d0f5;
+		--color-subtext1:	#b5bfe2;
+		--color-subtext0:	#a5adce;
+		--color-overlay2:	#949cbb;
+		--color-overlay1:	#838ba7;
+		--color-overlay0:	#737994;
+		--color-surface2:	#626880;
+		--color-surface1:	#51576d;
+		--color-surface0:	#414559;
+		--color-base:	#303446;
+		--color-mantle:	#292c3c;
+		--color-crust:	#232634;
 	}
 </style>

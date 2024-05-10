@@ -25,7 +25,7 @@
 <style scoped>
 	svg {
 		position: absolute;
-		fill: #51576d;
+		fill: var(--color-surface1);
 	}
 	.top-left,    .top-right 	 { top: 0; }
 	.bottom-left, .bottom-right { bottom: 0; }

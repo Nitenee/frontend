@@ -157,7 +157,7 @@
 		height: 100%;
 		width: 300px;
 		padding: 10px;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		border-radius: 20px;
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s;
@@ -176,10 +176,10 @@
 		flex-direction: column;
 		gap: 10px;
 		height: 100%;
-		background-color: #737994;
+		background-color: var(--color-overlay0);
 		box-shadow: 2px 2px 2px #0004;
 		padding: 10px;
-		scrollbar-color: #838ba7 #626880;
+		scrollbar-color: var(--color-overlay1) var(--color-surface2);
 		scrollbar-width: thin;
 		overflow-y: auto;
 	}
@@ -191,8 +191,8 @@
 		font-family: 'MikanNoki';
 		font-size: 30px;
 		font-weight: bold;
-		color: #c6d0f5;
-		-webkit-text-stroke: 1pt #303446;
+		color: var(--color-text);
+		-webkit-text-stroke: 1pt var(--color-base);
 		text-shadow: 2px 2px 2px #0007;
 		letter-spacing: -3px;
 		transition: translate 0.3s, text-shadow 0.3s;
@@ -204,7 +204,7 @@
 	.option-container {
 		display: flex;
 		flex-direction: column;
-		color: #c6d0f5; 
+		color: var(--color-text); 
 		border-radius: 5px;
 		box-shadow: 2px 2px 2px #0007;
 		transition: translate 0.3s, box-shadow 0.3s;
@@ -216,7 +216,7 @@
 	.option-title {
 		padding: 5px 10px;
 		border-radius: 5px 5px 0px 0px;
-		background-color: #303446;
+		background-color: var(--color-base);
 	}
 	.option-content {
 		display: flex;
@@ -224,13 +224,13 @@
 		gap: 5px;
 		padding: 10px;
 		border-radius: 0px 0px 5px 5px;
-		background-color: #51576d;
+		background-color: var(--color-surface1);
 	}
 	input {
 		all: unset;
 		text-align: center;
 		width: 30px;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		border-radius: 5px;
 		box-shadow: inset 0px 0px 2px #0004;
 		transition: color 0.3s;
@@ -250,14 +250,14 @@
 		margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 	}
 	input[type="checkbox"] {
-		background-color: #ea999c;
+		background-color: var(--color-maroon);
 		transition: background-color 0.3s;
 	}
 	input[disabled] {
-		color: #51576d;
+		color: var(--color-surface1);
 	}
 	input[type="checkbox"]:checked {
-		background-color: #a6d189;
+		background-color: var(--color-green);
 	}
 	input[type="checkbox"]:hover {
 		cursor: pointer;
@@ -278,14 +278,14 @@
 		width: 100%;
 	}
 	.wanikani input::placeholder {
-		color: #626880;
+		color: var(--color-surface2);
 	}
 	.save-button-container {
 		align-self: flex-end;
 		display: flex;
 		align-items: center;
 		padding: 10px 20px;
-		background-color: #414559;
+		background-color: var(--color-surface0);
 		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s;
@@ -302,7 +302,7 @@
 		height: 40px;
 		text-align: center;
 		border-radius: 5px;
-		background-color: #babbf1;
+		background-color: var(--color-lavender);
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s;
 	}
