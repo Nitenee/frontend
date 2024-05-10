@@ -7,7 +7,7 @@
 		>
 			<div>
 				<div class="puzzle-knob-container">
-					<svg class="puzzle-knob" height="37" width="100">
+					<svg class="puzzle-knob" height="35" width="100">
 						<path class="puzzle-knob-stroker" d="m 16 29 C 24 29 27 29 27 19 V 16 C 27 5 32 2 43 2 H 57 C 68 2 73 5 73 16 V 19 C 73 29 76 29 84 29 L 100 29 L 100 34 L 0 34 L 0 29 z" />
 						<path v-if="attachedCharacter" class="puzzle-knob-inner" d="m 19 31 C 24 31 32 27 32 19 V 10 C 32 7 35 3 38 3 H 62 C 65 3 68 7 68 10 V 19 C 68 27 76 31 81 31 L 100 31 L 100 32 L 0 32 L 0 31 z" />
 						<path v-else class="puzzle-knob-inner" d="m 19 31 C 24 31 32 27 32 19 V 10 C 32 7 35 3 38 3 H 62 C 65 3 68 7 68 10 V 19 C 68 27 76 31 81 31 L 95 31 L 95 32 L 5 32 L 5 31 z" />
@@ -79,6 +79,7 @@
 		translate: 0px 0px;
 	}
 	.meaning {
+		margin-top: -3px;
 		margin-bottom: 20px;
 		padding: 10px;
 		display: flex;
@@ -107,7 +108,7 @@
 	}
 	.puzzle-knob-container {
 		position: relative;
-		height: 35px;
+		height: 37px;
 		translate: 0px 2px;
 	}
 	.puzzle-knob {
