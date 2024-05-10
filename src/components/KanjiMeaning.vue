@@ -75,7 +75,7 @@
 		cursor: grab;
 		translate: -2px -2px;
 	}
-	.container.attached:hover > div{
+	.container.attached:hover > div {
 		translate: 0px 0px;
 	}
 	.meaning {

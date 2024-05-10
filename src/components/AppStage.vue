@@ -28,6 +28,7 @@
 	import { useKanjiSettings } from '@/stores/kanjisettings'
 	import { useDragAndDrop } from '@/stores/draganddrop'
 	import { useKanjiState } from '@/stores/kanjistate'
+	import { getCompliment } from '@/utils/compliments'
 	import { shuffleArray, apiRequest, wanikaniRequest } from '@/utils/utils'
 	import { Kanji, ServerKanji, CharacterInfo, KanjiBatchRequest } from '@/utils/types'
 	import gsap from 'gsap'
@@ -82,7 +83,7 @@
 
 	function onSubmit() {
 		if (state.readyToGoToNextKanjiBatch) {
-			getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
+			getNextKanjiBatch(getCompliment(), "Retrieving next kanji set...", true)
 		} else {
 			checkAnswers()
 		}
@@ -111,11 +112,11 @@
 			setTimeout(() => {
 				gsap.to('.shine', {
 					duration: 0.2,
-					translateY: '25%',
+					translateY: '50%',
 					stagger: 0.05,
 					onComplete: () => {
 						setTimeout(() => {
-							getNextKanjiBatch("ナイス！", "Retrieving next kanji set...", true)
+							getNextKanjiBatch(getCompliment(), "Retrieving next kanji set...", true)
 						}, 250)
 					}
 				})
@@ -127,10 +128,10 @@
 			setTimeout(() => {
 				gsap.to('.shine', {
 					duration: 0.1,
-					translateY: '25%',
-					stagger: 0.025,
+					translateY: '50%',
+					stagger: 0.05,
 					onComplete: () => {
-						popoverShow("グッドジョブ！", "Looking good!", true)
+						popoverShow(getCompliment(), "Looking good!", true)
 						setTimeout(() => {
 							state.setReadyToGoToNextKanjiBatch(true)
 							setTimeout(() => {

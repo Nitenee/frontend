@@ -97,8 +97,8 @@
 	}
 	.shine {
 		position: absolute;
-		width: 100px;
-		translate: 0 -80%;
+		width: 200px;
+		translate: 0 -110%;
 		height: 200%;
 		rotate: 45deg;
 		background-image: linear-gradient(to right, transparent, #fff7, transparent);
