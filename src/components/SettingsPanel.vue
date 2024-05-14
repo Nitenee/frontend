@@ -311,6 +311,7 @@
 		padding: 5px 10px;
 		border-radius: 5px 5px 0px 0px;
 		background-color: var(--color-base);
+		user-select: none;
 	}
 	.option-content {
 		display: flex;
@@ -364,9 +365,11 @@
 	.flex-grow {
 		text-align: center;
 		flex-grow: 1;
+		user-select: none;
 	}
 	.wanikani {
 		text-align: center;
+		user-select: none;
 	}
 	.wanikani input {
 		width: 100%;
@@ -384,6 +387,7 @@
 		border-radius: 10px;
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s;
+		user-select: none;
 	}
 	.save-button-container:has(> .save-button:hover) {
 		translate: 1px 1px;
