@@ -2,11 +2,6 @@
 	<section class="kanji-characters-container">
 		<div class="background-layer"></div>
 		<div class="background-layer-shadow"></div>
-		<div class="click-save-message-container">
-			<div class="click-save-message">
-				<span>Choose your settings to get started.</span>
-			</div>
-		</div>
 		<RoundedCorners :hideBottomLeft="true" :hideTopRight="true" :hideBottomRight="true" />
 			<TransitionGroup 
 				tag="div"
@@ -28,7 +23,6 @@
 </template>
 
 <script setup lang='ts'>
-	import { onMounted } from 'vue'
 	import gsap from 'gsap'
 	import KanjiContainer from '@/components/KanjiContainer.vue'
 	import RoundedCorners from '@/components/RoundedCorners.vue'
@@ -91,6 +85,7 @@
 		box-shadow: inset 0px 0px 2px 2px #0007;
 		border-top-right-radius: 20px;
 		border-bottom-right-radius: 20px;
+		transition: background-color 0.5s ease;
 	}
 	@keyframes backgroundpanner {
 		0% { translate: -50% -50%; }
@@ -112,7 +107,4 @@
 		scrollbar-color: var(--color-overlay1) var(--color-surface2);
 		scrollbar-width: thin;
 	}
-	.click-save-message {
-		
-}
 </style>

@@ -49,7 +49,6 @@
 
 	let wanikaniLevel = ref<number | null>(null)
 	let wanikaniUsername = ref("")
-	const playAllCorrectWaveAnimation = ref<(() => void) | null>(null)
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
