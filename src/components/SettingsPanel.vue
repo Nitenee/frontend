@@ -163,10 +163,8 @@
 		window.requestAnimationFrame(animateClickSaveArrow)
 	})
 
-	let xOffset = 0
-	let speed = 0.5
-	let goingForward = true
-	let bounds = 25
+	let animationSpeed = 1;
+	let animationDistancex = 15;
 
 	function animateClickSaveArrow() {
 		if(canvasEl.value) {
@@ -175,13 +173,14 @@
 			const ctx = canvasEl.value.getContext("2d")
 			if(!ctx || !saveButtonEl.value) return
 			const saveButtonRect = saveButtonEl.value.getBoundingClientRect()
+			let currTime = new Date().getSeconds()
+			let animationOffset = Math.sin(window.performance.now() * Math.PI * 0.001 * animationSpeed);
 
 			let y = (saveButtonRect.top + saveButtonRect.bottom) / 2
 			const curve = {
-				startx: window.innerWidth - 500,
-				starty: window.innerHeight / 2,
-				stopx: saveButtonRect.left - 100,
-				// stopx: saveButtonRect.left - 100 + xOffset,
+				startx: window.innerWidth - 500 + (animationOffset * animationDistancex) / -8,
+				starty: window.innerHeight / 2 + (animationOffset * animationDistancex) / -8,
+				stopx: saveButtonRect.left - 100 + animationOffset * animationDistancex,
 				stopy: y,
 				buttonx: saveButtonRect.left,
 				buttony: y,
@@ -196,8 +195,7 @@
 					x2: 10, y2: window.innerHeight - 50,
 				})
 
-				// curve.stopx = intersectingPoint.x + xOffset
-				curve.stopx = intersectingPoint.x
+				curve.stopx = intersectingPoint.x + animationOffset
 				curve.stopy = intersectingPoint.y
 			}
 			let normal = pointNormal(curve.stopx - curve.buttonx, curve.stopy - curve.buttony);
@@ -207,9 +205,6 @@
 				point1y: (curve.starty + curve.stopy) / 2,
 				point2x: curve.stopx + normal.x * endTangentLength,
 				point2y: curve.stopy + normal.y * endTangentLength,
-				// point1y: (curve.starty + curve.stopy) / 2,
-				// point2x: (curve.startx + curve.stopx) / 2,
-				// point2y: (curve.stopy - curve.starty) * 0.75 + curve.starty,
 			}
 
 
@@ -230,36 +225,13 @@
 			ctx.translate(curve.stopx * -1, curve.stopy * -1)
 			ctx.beginPath()
 			ctx.moveTo(curve.stopx, curve.stopy)
-			//new stuff from Here
 			ctx.lineTo(curve.stopx - 20, curve.stopy - 20)
 			ctx.stroke()
 			ctx.moveTo(curve.stopx, curve.stopy)
 			ctx.lineTo(curve.stopx - 20, curve.stopy + 20)
 			ctx.stroke()
-			// ctx.lineTo(curve.stopx, curve.stopy - 15)
-			// ctx.stroke()
-			// ctx.moveTo(curve.stopx, curve.stopy - 15)
-			// ctx.lineTo(curve.stopx + 30, curve.stopy)
-			// ctx.stroke()
-			// ctx.moveTo(curve.stopx + 30, curve.stopy)
-			// ctx.lineTo(curve.stopx, curve.stopy + 15)
-			// ctx.stroke()
-			// ctx.moveTo(curve.stopx, curve.stopy + 15)
-			// ctx.lineTo(curve.stopx, curve.stopy)
-			// ctx.stroke()
-			// ctx.beginPath()
-			// ctx.moveTo(curve.stopx, curve.stopy)
-			// ctx.lineTo(curve.stopx, curve.stopy - 15)
-			// ctx.lineTo(curve.stopx + 30, curve.stopy)
-			// ctx.lineTo(curve.stopx, curve.stopy + 15)
-			// ctx.lineTo(curve.stopx, curve.stopy)
 			ctx.fill()
 			ctx.restore()
-
-			//Handle offset change
-			if(goingForward) xOffset += speed
-			else xOffset -= speed
-			if(Math.abs(xOffset) >= bounds) goingForward = !goingForward
 
 			window.requestAnimationFrame(animateClickSaveArrow)
 		}
