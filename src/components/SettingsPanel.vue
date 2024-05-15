@@ -1,9 +1,19 @@
 <template>
 	<section>
 		<div class="click-save-overlay" :class="hasSelectedSettings ? 'hide-overlay' : ''"></div>
-		<div class="click-save-canvas-wrapper">
-			<canvas ref="canvasEl" class="click-save-canvas"></canvas>
-		</div>
+		<Transition name="arrow" appear>
+			<div v-if="!hasSelectedSettings" class="click-save-canvas-wrapper">
+				<canvas ref="canvasEl" class="click-save-canvas"></canvas>
+			</div>
+		</Transition>
+		<Transition appear @enter="onClickSaveTextEnter" @leave="onClickSaveTextLeave">
+			<div v-if="!hasSelectedSettings" class="click-save-text-wrapper">
+				<span>Click</span>
+				<span>Start</span>
+				<span>to</span>
+				<span>Begin!</span>
+			</div>
+		</Transition>
 		<div class="settings-panel-container">
 			<div class="scrollbar-rounder">
 				<div class="settings-panel">
@@ -74,7 +84,10 @@
 							class="save-button"
 							ref="saveButtonEl"
 							@click="updateValues">
-							Save
+							<Transition name="save-button" mode="out-in">
+								<span v-if="!hasSelectedSettings">Start</span>
+								<span v-else>Update</span>
+							</Transition>
 						</button>
 					</div>
 				</div>
@@ -85,15 +98,14 @@
 
 <script setup lang='ts'>
 	import { ref, computed, onMounted } from 'vue'
+	import gsap from 'gsap'
 	import { storeToRefs } from 'pinia'
 	import { useKanjiSettings } from '@/stores/kanjisettings'
 	import { useKanjiState } from '@/stores/kanjistate'
-	import { useDragAndDrop } from '@/stores/draganddrop'
 	import { findIntersection, calculateAngleBetweenPoints, pointNormal } from '@/utils/utils'
 
 	const emit = defineEmits(['settingsUpdated']);
 	const store = useKanjiSettings()
-	const dragAndDrop = useDragAndDrop()
 	const { hasSelectedSettings } = storeToRefs(useKanjiState())
 
 	const upperLimitDisabled = computed(() => store.useWanikaniLevel ? "disabled" : "")
@@ -235,6 +247,26 @@
 
 			window.requestAnimationFrame(animateClickSaveArrow)
 		}
+	}
+
+	function onClickSaveTextEnter() {
+		gsap.from('.click-save-text-wrapper span', {
+			duration: 0.5,
+			stagger: 0.1,
+			opacity: 0,
+			delay: 0.25,
+			translateX: -100
+		})
+	}
+	function onClickSaveTextLeave(_: HTMLElement, done: () => void) {
+		gsap.to('.click-save-text-wrapper span', {
+			duration: 0.5,
+			stagger: 0.1,
+			opacity: 0,
+			delay: 0.25,
+			translateX: 100,
+			onComplete: done
+		})
 	}
 </script>
 
@@ -410,6 +442,18 @@
 		background-color: #cacbff;
 		translate: -2px -2px;
 	}
+	.save-button-enter-active,
+	.save-button-leave-active {
+		transition: all 0.5s ease;
+	}
+	.save-button-enter-from {
+		opacity: 0;
+		transform: translateY(-30px);
+	}
+	.save-button-leave-to {
+		opacity: 0;
+		transform: translateY(30px);
+	}
 	.click-save-overlay {
 		position: absolute;
 		width: 100%;
@@ -432,6 +476,70 @@
 		pointer-events: none;
 		user-select: none;
 		z-index: 5;
-		filter: drop-shadow(2px 2px 2px #0007);
+		filter: drop-shadow(-3px 3px 0px var(--color-surface1));
+	}
+	.arrow-enter-active,
+	.arrow-leave-active {
+		transition: all 1s ease;
+	}
+	.arrow-enter-from {
+		opacity: 0;
+		translate: -100px 0px;
+	}
+	.arrow-leave-to {
+		opacity: 0;
+		translate: 100px 0px;
+	}
+	.click-save-text-wrapper {
+		position: absolute;
+		margin-left: 100px;
+		margin-right: 200px;
+		margin-bottom: 100px;
+		color: var(--color-text);
+		top: 50%;
+		translate: 0px -50%;
+		font-size: 80px;
+		font-weight: bold;
+		right: 320px;
+		text-shadow: 3px 3px 0px var(--color-surface1);
+		text-align: right;
+		max-width: 400px;
+		user-select: none;
+		pointer-events: none;
+	}
+	.click-save-text-wrapper span {
+		display: inline-block;
+		margin: 0px 15px;
+	}
+	@media(height < 700px) {
+		.click-save-text-wrapper {
+			font-size: 70px;
+		}
+	}
+	@media(height < 600px) {
+		.click-save-text-wrapper {
+			font-size: 60px;
+		}
+	}
+	@media(height < 500px) {
+		.click-save-text-wrapper {
+			font-size: 50px;
+		}
+	}
+	@media(width < 900px) {
+		.click-save-text-wrapper {
+			font-size: 70px;
+		}
+	}
+	@media(width < 850px) {
+		.click-save-text-wrapper {
+			font-size: 60px;
+		}
+	}
+	@media(width < 800px) {
+		.click-save-text-wrapper {
+			right: 200px;
+			top: 25%;
+		}
 	}
 </style>
