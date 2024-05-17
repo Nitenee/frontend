@@ -178,6 +178,15 @@
 	let animationSpeed = 1;
 	let animationDistancex = 15;
 
+	window.addEventListener('resize', () => {
+		if(canvasEl.value) {
+			let appEl = document.querySelector("#app")
+			if(!appEl) return
+			canvasEl.value.width = appEl.clientWidth
+			canvasEl.value.height = appEl.clientHeight
+		}
+	})
+
 	function animateClickSaveArrow() {
 		if(canvasEl.value) {
 			canvasEl.value.width = window.innerWidth
