@@ -76,10 +76,20 @@
 		min-width: 200px;
 		background-color: var(--color-surface0);
 	}
+	@media(width <= 515px) {
+		.kanji-meanings {
+			min-width: fit-content;
+		}
+	}
 	.kanji-meaning-items-container {
 		height: calc(100% - 110px);
 		background-color: var(--color-surface0);
 		box-shadow: inset 2px -2px 2px #0007;
+	}
+	@media(width <= 515px) {
+		.kanji-meaning-items-container {
+			height: calc(100% - 90px);
+		}
 	}
 	.kanji-meaning-items-container > div {
 		position: relative;
@@ -130,6 +140,17 @@
 		background-color: var(--color-lavender);
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s, background-color 0.3s;
+	}
+	@media(width <= 515px) {
+		.button-container div {
+			width: 120px;
+			height: 60px;
+			margin: 0px 10px 0 5px;
+		}
+		.submit-button {
+			width: 100px;
+			height: 40px;
+		}
 	}
 	.submit-button:disabled {
 		background-color: var(--color-overlay1);
