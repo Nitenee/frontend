@@ -10,7 +10,7 @@
 			ref="popover" 
 		/>
 		<DragIllusion />
-		<NavBar @togglesettings="toggleSettings" />
+		<NavBar />
 		<div ref="puzzleStage" id="puzzle-stage">
 			<KanjiMeaningSection @on-submit="onSubmit" />
 			<KanjiCharacterSection />
@@ -24,7 +24,7 @@
 		FIX:
 		Meanings not breaking mid word correctly
 	*/
-	import { ref, computed } from 'vue'
+	import { ref, computed, onMounted } from 'vue'
 	import { useKanjiSettings } from '@/stores/kanjisettings'
 	import { useDragAndDrop } from '@/stores/draganddrop'
 	import { useKanjiState } from '@/stores/kanjistate'
@@ -52,9 +52,8 @@
 	const popover = ref<HTMLElement | null>(null)
 	const popoverText = ref("")
 	const popoverSubtext = ref("")
-	const showSettings = ref(true)
 	const toggleSettingsStyle = computed(() => {
-		if(showSettings.value) {
+		if(state.showSettings) {
 			return "showSettings"
 		} else {
 			return ""
@@ -176,18 +175,6 @@
 		popover.value.popover.classList.remove('animate')
 	}
 
-
-	function toggleSettings() {
-		//Programmatically add and remove transition so there's no strange animations on window resize
-		if(!puzzleStage.value) throw new Error("Tried to access puzzleStage ref but it's null")
-		puzzleStage.value.style.transition = 'width 1s cubic-bezier(.75,0,.25,1)'
-		setTimeout(() => {
-			if(!puzzleStage.value) throw new Error("Tried to access puzzleStage ref but it's null")
-			puzzleStage.value.style.transition = ''
-		}, 1000)
-		showSettings.value = !showSettings.value
-	}
-
 	function updateSettings() {
 		if(!wanikaniLevel.value && settings.wanikaniAPIKey) {
 			popoverShow("ちょい待ちこ", "Fetching Wanikani info...", false)
@@ -195,15 +182,19 @@
 				wanikaniLevel.value = userData.data.level
 				wanikaniUsername.value = userData.data.username
 				state.setHasSelectedSettings(true)
-				toggleSettings()
+				state.setShowSettings(!state.showSettings)
 				getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 			})
 		} else {
 			state.setHasSelectedSettings(true)
-			toggleSettings()
+			state.setShowSettings(!state.showSettings)
 			getNextKanjiBatch("設定をセーブしたよん！", "Retrieving kanji list...", false)
 		}
 	}
+
+	onMounted(() => {
+		state.registerToggleSettingsEffectElement(puzzleStage)
+	})
 
 	function getNextKanjiBatch(popoverText: string, popoverSubtext: string, animate: boolean) {
 		popoverShow(popoverText, popoverSubtext, animate)
@@ -294,10 +285,15 @@
 		display: flex;
 		width: calc(100vw + 295px);
 	}
-	#stage.showSettings #puzzle-stage {
-		width: calc(100vw - 20px);
+	@media (width >= 750px) {
+		#stage.showSettings #puzzle-stage {
+			width: calc(100vw - 20px);
+		}
 	}
 	.dragging-cursor {
 		cursor: grabbing !important; /* Don't allow override while dragging!!! */
+	}
+	@media (width < 750) {
+		
 	}
 </style>

@@ -1,13 +1,13 @@
 <template>
-	<section>
-		<div class="click-save-overlay" :class="hasSelectedSettings ? 'hide-overlay' : ''"></div>
+	<section ref="sectionWrapperEl" :class="state.showSettings.value ? 'mobile-show-settings' : ''">
+		<div class="click-save-overlay" :class="state.hasSelectedSettings.value ? 'hide-overlay' : ''"></div>
 		<Transition name="arrow" appear>
-			<div v-if="!hasSelectedSettings" class="click-save-canvas-wrapper">
+			<div v-if="!state.hasSelectedSettings.value" class="click-save-canvas-wrapper">
 				<canvas ref="canvasEl" class="click-save-canvas"></canvas>
 			</div>
 		</Transition>
 		<Transition appear @enter="onClickSaveTextEnter" @leave="onClickSaveTextLeave">
-			<div v-if="!hasSelectedSettings" class="click-save-text-wrapper">
+			<div v-if="!state.hasSelectedSettings.value" class="click-save-text-wrapper">
 				<span>Click</span>
 				<span>Start</span>
 				<span>to</span>
@@ -85,7 +85,7 @@
 							ref="saveButtonEl"
 							@click="updateValues">
 							<Transition name="save-button" mode="out-in">
-								<span v-if="!hasSelectedSettings">Start</span>
+								<span v-if="!state.hasSelectedSettings.value">Start</span>
 								<span v-else>Update</span>
 							</Transition>
 						</button>
@@ -106,11 +106,13 @@
 
 	const emit = defineEmits(['settingsUpdated']);
 	const store = useKanjiSettings()
-	const { hasSelectedSettings } = storeToRefs(useKanjiState())
+	const { registerToggleSettingsEffectElement } = useKanjiState()
+	const state = storeToRefs(useKanjiState())
 
-	const upperLimitDisabled = computed(() => store.useWanikaniLevel ? "disabled" : "")
+	const sectionWrapperEl = ref<HTMLElement | null>(null)
 	const saveButtonEl = ref<HTMLElement | null>(null)
 	const canvasEl = ref<HTMLCanvasElement | null>(null)
+	const upperLimitDisabled = computed(() => store.useWanikaniLevel ? "disabled" : "")
 
 	function checkLimits(inLimit: string) {
 		if(inLimit == "upper") {
@@ -172,8 +174,11 @@
 			store.setLevelLimitLower(Number(levelLimitLower))
 		}
 
+		registerToggleSettingsEffectElement(sectionWrapperEl)
+
 		window.requestAnimationFrame(animateClickSaveArrow)
 	})
+
 
 	let animationSpeed = 1;
 	let animationDistancex = 15;
@@ -194,7 +199,6 @@
 			const ctx = canvasEl.value.getContext("2d")
 			if(!ctx || !saveButtonEl.value) return
 			const saveButtonRect = saveButtonEl.value.getBoundingClientRect()
-			let currTime = new Date().getSeconds()
 			let animationOffset = Math.sin(window.performance.now() * Math.PI * 0.001 * animationSpeed);
 
 			let y = (saveButtonRect.top + saveButtonRect.bottom) / 2
@@ -549,6 +553,47 @@
 		.click-save-text-wrapper {
 			right: 200px;
 			top: 25%;
+		}
+	}
+
+	@media(width < 750px) {
+		.click-save-overlay,
+		.click-save-canvas-wrapper,
+		.click-save-text-wrapper {
+			display: none;
+		}
+		section {
+			position: fixed;
+			height: calc(100dvh - 60px);
+		}
+	}
+	@media(500px < width < 750px) {
+		section {
+			right: 0;
+			width: 300px;
+			translate: 100% -4px;
+		}
+		section.mobile-show-settings {
+			translate: -5px -4px;
+		}
+		.settings-panel-container {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+	}
+	@media(width <= 500px) {
+		section {
+			bottom: 0;
+			translate: -2px 100%;
+			height: calc(100dvh - 55px);
+			padding: 0;
+		}
+		.settings-panel-container {
+			width: 100dvw;
+			border-radius: 0;
+		}
+		section.mobile-show-settings {
+			translate: -2px 0;
 		}
 	}
 </style>

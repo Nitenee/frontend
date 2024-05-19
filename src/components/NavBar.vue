@@ -8,7 +8,7 @@
 			<div>！</div>
 		</div>
 		<div class="settings-button-container">
-			<button class="settings-button" @click.prevent="emit('togglesettings')">
+			<button class="settings-button" @click.prevent="toggleSettings">
 				<CogWheelSVG />
 			</button>
 		</div>
@@ -17,8 +17,13 @@
 
 <script setup lang='ts'>
 	import CogWheelSVG from './CogWheelSVG.vue'
+	import { useKanjiState } from '@/stores/kanjistate'
 
-	const emit = defineEmits(['togglesettings'])
+	const state = useKanjiState()
+
+	function toggleSettings() {
+		state.setShowSettings(!state.showSettings)
+	}
 </script>
 
 <style scoped>
