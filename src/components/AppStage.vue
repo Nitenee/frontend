@@ -290,6 +290,11 @@
 			width: calc(100vw - 20px);
 		}
 	}
+	@media (width < 750px) {
+		#stage #puzzle-stage {
+			width: calc(100vw - 5px);
+		}
+	}
 	.dragging-cursor {
 		cursor: grabbing !important; /* Don't allow override while dragging!!! */
 	}

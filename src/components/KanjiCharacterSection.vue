@@ -61,8 +61,8 @@
 <style scoped>
 	.kanji-characters-container {
 		position: relative;
-		height: calc(100vh - 64px);
-		width: calc(100vw - 500px);
+		height: calc(100dvh - 64px);
+		width: calc(100dvw - 500px);
 		min-width: 200px;
 		flex-grow: 1;
 		background-color: var(--color-base);
