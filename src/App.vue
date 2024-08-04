@@ -16,12 +16,12 @@
 		margin: 0;
 		background-color: var(--color-base);
 		color: var(--color-crust);
-		overflow: hidden;
+		overflow: clip;
 	}
 	main {
 		padding: 2px;
 		background-color: var(--color-surface1);
-		overflow: hidden;
+		overflow: clip;
 	}
 	/* Colors */
 	:root {

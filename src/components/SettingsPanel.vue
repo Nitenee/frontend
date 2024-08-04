@@ -1,6 +1,6 @@
 <template>
+	<div class="click-save-overlay" :class="state.hasSelectedSettings.value ? 'hide-overlay' : ''"></div>
 	<section ref="sectionWrapperEl" :class="state.showSettings.value ? 'mobile-show-settings' : ''">
-		<div class="click-save-overlay" :class="state.hasSelectedSettings.value ? 'hide-overlay' : ''"></div>
 		<Transition name="arrow" appear>
 			<div v-if="!state.hasSelectedSettings.value" class="click-save-canvas-wrapper">
 				<canvas ref="canvasEl" class="click-save-canvas"></canvas>
@@ -19,6 +19,9 @@
 				<div class="settings-panel">
 					<div class="panel-title">
 						設定
+					</div>
+					<div v-if="!state.hasSelectedSettings.value" class="option-container inline-click-save-message-container">
+						Choose settings to start!
 					</div>
 					<div class="option-container">
 						<div class="option-title">
@@ -474,10 +477,12 @@
 		left: 0;
 		top: 0;
 		background-color: #000a;
-		transition: 0.5s background-color ease;
+		transition: 0.5s background-color ease, 0.5s backdrop-filter ease;
+		backdrop-filter: blur(2px);
 	}
 	.hide-overlay {
 		background-color: #0000;
+		backdrop-filter: blur(0px);
 		pointer-events: none;
 	}
 	.click-save-canvas-wrapper {
@@ -490,6 +495,12 @@
 		user-select: none;
 		z-index: 5;
 		filter: drop-shadow(-3px 3px 0px var(--color-surface1));
+	}
+	.inline-click-save-message-container {
+		display: none;
+		background-color: var(--color-base);
+		text-align: center;
+		padding: 10px 0px;
 	}
 	.arrow-enter-active,
 	.arrow-leave-active {
@@ -557,10 +568,16 @@
 	}
 
 	@media(width < 750px) {
-		.click-save-overlay,
 		.click-save-canvas-wrapper,
 		.click-save-text-wrapper {
 			display: none;
+		}
+		.click-save-overlay {
+			width: 100vw;
+			height: 100dvh;
+		}
+		.inline-click-save-message-container {
+			display: inherit;
 		}
 		section {
 			position: fixed;

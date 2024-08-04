@@ -76,7 +76,7 @@
 		min-width: 200px;
 		background-color: var(--color-surface0);
 	}
-	@media(width <= 515px) {
+	@media(width <= 515px), (height <= 515px) {
 		.kanji-meanings {
 			min-width: fit-content;
 		}
@@ -86,7 +86,7 @@
 		background-color: var(--color-surface0);
 		box-shadow: inset 2px -2px 2px #0007;
 	}
-	@media(width <= 515px) {
+	@media(width <= 515px), (height <= 515px) {
 		.kanji-meaning-items-container {
 			height: calc(100% - 90px);
 		}
@@ -141,7 +141,7 @@
 		box-shadow: 2px 2px 2px #0004;
 		transition: translate 0.3s, box-shadow 0.3s, background-color 0.3s;
 	}
-	@media(width <= 515px) {
+	@media(width <= 515px), (height <= 515px) {
 		.button-container div {
 			width: 120px;
 			height: 60px;

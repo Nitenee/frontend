@@ -78,6 +78,12 @@
 		animation: backgroundpanner 10s linear infinite;
 		transform: translate(-50% -50%);
 	}
+	@media (width <= 500px) {
+		.background-layer {
+			animation: none;
+			transform: translate(-50% -50%);
+		}
+	}
 	.background-layer-shadow {
 		position: absolute;
 		width: 100%;

@@ -279,7 +279,7 @@
 		display: flex;
 		flex-direction: column;
 		height: calc(100dvh - 4px);
-		overflow: hidden;
+		overflow: clip;
 	}
 	#puzzle-stage {
 		display: flex;

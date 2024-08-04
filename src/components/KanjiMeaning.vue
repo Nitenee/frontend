@@ -30,14 +30,17 @@
 		meaning: String,
 		attachedCharacter: String
 	});	
+	
+	// I dont think we need this but commenting out for now
+	// TODO: Delete me?
+	// const puzzleHoleClasses = computed(() => {
+	// 	const classes = ['puzzle-hole']
+	// 	if(props.attachedCharacter) {
+	// 		classes.push('no-shadow')
+	// 	}
+	// 	return classes.join(' ')
+	// })
 
-	const puzzleHoleClasses = computed(() => {
-		const classes = ['puzzle-hole']
-		if(props.attachedCharacter) {
-			classes.push('no-shadow')
-		}
-		return classes.join(' ')
-	})
 	const attached = computed(() => {
 		if(props.attachedCharacter) {
 			return "attached"
@@ -50,7 +53,7 @@
 		if(!containerElement.value) throw new Error("Clicked on meaning but ref is null")
 		if(!props.meaning) throw new Error("Clicked on meaning but meaning prop is null")
 		//If mouse, only take left click
-		if(e.pointerType === "mouse" && e.button !== 0) return
+		if(e.pointerType === "mouse" && e.button !== 0 || e.pointerType === "touch") return
 
 		store.setDragging({
 			element: containerElement.value,
